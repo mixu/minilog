@@ -40,13 +40,32 @@ exports['given a minilog'] = {
     done();
   },
 
+  'can use log.error, log.warn, log.info, log.trace': function(done) {
+    this.log.error('aaa');
+    assert.equal(this.stream.content[0], 'error aaa');
+    this.log.warn('aaa');
+    assert.equal(this.stream.content[1], 'warn aaa');
+    this.log.info('aaa');
+    assert.equal(this.stream.content[2], 'info aaa');
+    this.log.trace('aaa');
+    assert.equal(this.stream.content[3], 'trace aaa');
+    done();
+  },
+
   'can create a namespaced logger': function(done) {
     this.log = MiniLog('ns');
     this.log('foo');
     assert.equal(this.stream.content[0], 'ns foo');
+    this.log.error('aaa');
+    assert.equal(this.stream.content[1], 'ns error aaa');
+    this.log.warn('aaa');
+    assert.equal(this.stream.content[2], 'ns warn aaa');
+    this.log.info('aaa');
+    assert.equal(this.stream.content[3], 'ns info aaa');
+    this.log.trace('aaa');
+    assert.equal(this.stream.content[4], 'ns trace aaa');
     done();
   }
-
 };
 
 // if this module is the script being run, then run the tests:
