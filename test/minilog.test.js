@@ -20,7 +20,7 @@ exports['given a minilog'] = {
 
   beforeEach: function(done) {
     this.stream = new WriteStream();
-    MiniLog.pipe(this.stream);
+    this.pipe = MiniLog.pipe(this.stream);
     this.log = MiniLog();
     done();
   },
@@ -85,21 +85,12 @@ exports['given a minilog'] = {
 
   'can filter by namespace and type': function(done) {
     var ns = MiniLog('ns'),
-        ns2 = MiniLog('ns2'),
-        oldFilter = MiniLog.filter;
+        ns2 = MiniLog('ns2');
 
-    // TODO: this should be just a function that returns true / false
-    // TODO: formatters should also be pluggable (?? or maybe they belong in the backend)
-    // What about formatters / filters which we want to apply to just one backend?
+    this.pipe.filter(function(name, level) {
+      return name == 'ns2' && (level == 'info' || level == 'error');
+    });
 
-    MiniLog.filter = function(name, level, args, log) {
-      var prefix = [];
-      if(name) prefix.push(name);
-      if(level) prefix.push(level);
-      if(name == 'ns2' && (level == 'info' || level == 'error')) {
-        log(prefix.concat(args).join(' '));
-      }
-    };
     ns('foo');
     ns2('abc');
     ns2.info('cde');
@@ -107,7 +98,6 @@ exports['given a minilog'] = {
     ns2.error('fgh');
     assert.equal(this.stream.content[0], 'ns2 info cde\n');
     assert.equal(this.stream.content[1], 'ns2 error fgh\n');
-    MiniLog.filter = oldFilter;
     done();
   },
 
@@ -121,6 +111,22 @@ exports['given a minilog'] = {
       assert.equal(fs.readFileSync('./temp.log').toString(), 'hello world\nfoobar\n');
       done();
     }, 10);
+  },
+
+  'can format logs': function(done) {
+    this.pipe.format(function(name, level, args) {
+      return (name ? name.toUpperCase() + ' - ' : '')
+           + (level ? level.toUpperCase() + ' - ' : '')
+           + args.join(' ') + '\n';
+    });
+
+    this.log.error('aaa');
+    this.log.warn('aaa');
+    this.log.info('aaa');
+    assert.equal(this.stream.content[0], 'ERROR - aaa\n');
+    assert.equal(this.stream.content[1], 'WARN - aaa\n');
+    assert.equal(this.stream.content[2], 'INFO - aaa\n');
+    done();
   }
 
 };

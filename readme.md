@@ -3,7 +3,7 @@
 # Features
 
 - Works in the browser and on the server
-- Very simple client; looks like a readable stream/eventemitter
+- Very simple client (no external dependencies; less than 100 lines); looks like a readable stream/eventemitter
 - Backends are writable streams; allow for picking whatever transport/format you want
 - Logs are optionally scoped/namespaced to a particular module, like TJ's [debug](https://github.com/visionmedia/debug) and can be enabled/disabled selectively
 - log.error, log.warn, log.info, log.trace
@@ -52,18 +52,25 @@ Output:
 
 ## Filtering logs by namespace or level
 
-TODO not implemented like this yet
+Filters can be applied to pipes:
 
     MiniLog
-      .pipe(process.stdout)
-      .filter(function(name, level) {
+      .filter(process.stdout, function(name, level) {
         var ns = {'worker': true, 'http': true},
             type = {'warn': true, 'error': true};
         return whitelist[name] && type[level];
-      })
-      .format(function(name, level, args) {
-        // todo
-      };
+      });
+
+## Formatting
+
+Formatting can be applied to pipes:
+
+    MiniLog
+      .format(process.stdout, function(name, level, args) {
+        return (name ? name.toUpperCase() + ' - ' : '')
+             + (level ? level.toUpperCase() + ' ' : '')
+             + args.join(' ') + '\n';
+      });
 
 ## Counting and timing
 
