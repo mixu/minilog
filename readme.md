@@ -1,10 +1,8 @@
-# minilog
-
-# Features
+# minilog - features
 
 - Works in the browser and on the server
 - Very simple client (no external dependencies; less than 100 lines); looks like a readable stream/eventemitter
-- Backends are writable streams; allow for picking whatever transport/format you want
+- Backends are writable streams, simple to write new adapters
 - Logs are optionally scoped/namespaced to a particular module, like TJ's [debug](https://github.com/visionmedia/debug) and can be enabled/disabled selectively
 - log.error, log.warn, log.info, log.trace
 
@@ -14,6 +12,16 @@ Backends:
 - Support for counting and timing via #event_hashtags, like Olark's [hashmonitor](https://github.com/olark/hashmonitor) ([presentation](https://speakerdeck.com/u/mjpizz/p/monitor-like-a-boss)); this is implemented as a backend
 
 # Examples
+
+## Pipes everywhere
+
+To log to the console:
+
+    require('minilog').pipe(process.stdout);
+
+To log into a file:
+
+    MiniLog.pipe(fs.createWriteStream('./temp.log'));
 
 ## Namespaces
 
@@ -33,22 +41,6 @@ Output:
     worker info Booting {"foo":"bar"}
     worker error FooBar
     worker Hello World
-
-## Writing to file
-
-    var fs = require('fs'),
-        MiniLog = require('minilog'),
-        log = MiniLog('worker');
-
-    MiniLog.pipe(fs.createWriteStream('./temp.log'));
-
-    log('Booting');
-    log.error('FooBar');
-
-Output:
-
-    worker Booting
-    worker error FooBar
 
 ## Filtering logs by namespace or level
 
