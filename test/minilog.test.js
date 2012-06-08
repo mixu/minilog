@@ -17,14 +17,19 @@ WriteStream.prototype.write = function(string, encoding) {
   this.content.push(string);
 };
 
+WriteStream.prototype.end = function() {};
 
 exports['given a minilog'] = {
 
   beforeEach: function(done) {
     this.stream = new WriteStream();
     MiniLog.pipe(this.stream);
-
     this.log = MiniLog();
+    done();
+  },
+
+  afterEach: function(done) {
+    MiniLog.end();
     done();
   },
 
