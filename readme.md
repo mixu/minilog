@@ -15,16 +15,63 @@ Backends:
 
 # Examples
 
-    var log = require('minilog')('worker');
+## Namespaces
 
-    log('Booting', name); // Defaults to "log.info"
+You can namespace logs:
+
+    var log = require('minilog')('worker'),
+        config = { foo: 'bar' };
+
+    require('minilog').pipe(process.stdout);
+
+    log.info('Booting', config);
+    log.error('FooBar');
+    log('Hello', 'World');
+
+Output:
+
+    worker info Booting {"foo":"bar"}
+    worker error FooBar
+    worker Hello World
+
+## Writing to file
+
+    var fs = require('fs'),
+        MiniLog = require('minilog'),
+        log = MiniLog('worker');
+
+    MiniLog.pipe(fs.createWriteStream('./temp.log'));
+
+    log('Booting');
+    log.error('FooBar');
+
+Output:
+
+    worker Booting
+    worker error FooBar
+
+## Filtering logs by namespace or level
+
+TODO not implemented like this yet
+
+    MiniLog
+      .pipe(process.stdout)
+      .filter(function(name, level) {
+        var ns = {'worker': true, 'http': true},
+            type = {'warn': true, 'error': true};
+        return whitelist[name] && type[level];
+      })
+      .format(function(name, level, args) {
+        // todo
+      };
+
+## Counting and timing
+
+TODO not done
+
     log.error('cookie problems #nocookies_for_session'); // use #event for counting
     log.info('#connected #boot_time=100'); // use #timing=value for timing
 
-    // configuring
-    var minilog = require('minilog');
+## Using it in the browser
 
-    minilog.on('data', function backend() {
-
-    });
-
+TODO - use Glue or onejs.

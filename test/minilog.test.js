@@ -6,9 +6,6 @@ function WriteStream() {
   var self = this;
   this.writable = true;
   this.content = [];
-  this.on('data', function(string) {
-    self.write(string);
-  });
 }
 
 require('util').inherits(WriteStream, require('events').EventEmitter);
@@ -90,6 +87,11 @@ exports['given a minilog'] = {
     var ns = MiniLog('ns'),
         ns2 = MiniLog('ns2'),
         oldFilter = MiniLog.filter;
+
+    // TODO: this should be just a function that returns true / false
+    // TODO: formatters should also be pluggable (?? or maybe they belong in the backend)
+    // What about formatters / filters which we want to apply to just one backend?
+
     MiniLog.filter = function(name, level, args, log) {
       var prefix = [];
       if(name) prefix.push(name);
