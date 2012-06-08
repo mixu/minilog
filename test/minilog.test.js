@@ -1,6 +1,6 @@
 var fs = require('fs'),
     assert = require('assert'),
-    MiniLog = require('../lib/minilog.js');
+    MiniLog = require('../minilog.js');
 
 function WriteStream() {
   var self = this;

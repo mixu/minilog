@@ -55,7 +55,8 @@ Output:
 Filters can be applied to pipes:
 
     MiniLog
-      .filter(process.stdout, function(name, level) {
+      .pipe(process.stdout)
+      .filter(function(name, level) {
         var ns = {'worker': true, 'http': true},
             type = {'warn': true, 'error': true};
         return whitelist[name] && type[level];
@@ -66,7 +67,8 @@ Filters can be applied to pipes:
 Formatting can be applied to pipes:
 
     MiniLog
-      .format(process.stdout, function(name, level, args) {
+      .pipe(process.stdout)
+      .format(function(name, level, args) {
         return (name ? name.toUpperCase() + ' - ' : '')
              + (level ? level.toUpperCase() + ' ' : '')
              + args.join(' ') + '\n';
