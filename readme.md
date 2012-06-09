@@ -110,6 +110,8 @@ Setup:
     MiniLog('foo').info('Hello world');
     MiniLog('bar').info('Hello world');
 
+Note that filters are applied to each pipe individually, so if you have two pipes, you need to set the filter on both (or you can use different filters).
+
 Examples of whitelisting and blacklisting:
 
     $ export DEBUG=app && node whitelist_example.js
