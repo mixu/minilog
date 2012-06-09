@@ -37,11 +37,11 @@ function serialize(args) {
 }
 
 exports = module.exports = function create(name) {
-  var o   = function() { log.emit('item', name, undefined, serialize(arguments)); };
-  o.error = function() { log.emit('item', name, 'error', serialize(arguments)); };
-  o.warn  = function() { log.emit('item', name, 'warn',  serialize(arguments)); };
-  o.info  = function() { log.emit('item', name, 'info',  serialize(arguments)); };
-  o.trace = function() { log.emit('item', name, 'trace', serialize(arguments)); };
+  var o   = function() { log.emit('item', name, undefined, serialize(arguments)); return o; };
+  o.debug = function() { log.emit('item', name, 'debug', serialize(arguments)); return o; };
+  o.info  = function() { log.emit('item', name, 'info',  serialize(arguments)); return o; };
+  o.warn  = function() { log.emit('item', name, 'warn',  serialize(arguments)); return o; };
+  o.error = function() { log.emit('item', name, 'error', serialize(arguments)); return o; };
   return o;
 };
 

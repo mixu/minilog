@@ -4,7 +4,7 @@
 - Very simple client (no external dependencies; less than 100 lines); looks like a readable stream/eventemitter
 - Backends are writable streams, simple to write new adapters
 - Logs are optionally scoped/namespaced to a particular module, like TJ's [debug](https://github.com/visionmedia/debug) and can be enabled/disabled selectively
-- log.error, log.warn, log.info, log.trace
+- log.debug, log.info, log.warn, log.error
 
 Backends:
 
@@ -21,18 +21,29 @@ To log to the console:
 
 To log into a file:
 
-    MiniLog.pipe(fs.createWriteStream('./temp.log'));
+    require('minilog').pipe(fs.createWriteStream('./temp.log'));
 
-## Namespaces
+## Basic usage and namespaces
 
-You can namespace logs:
+Basic usage:
 
-    var log = require('minilog')('worker'),
-        config = { foo: 'bar' };
+    var log = require('minilog')();
 
     require('minilog').pipe(process.stdout);
 
-    log.info('Booting', config);
+    log
+      .debug('debug message')
+      .info('info message')
+      .warn('warning')
+      .error('this is an error message');
+
+You can namespace logs:
+
+    var log = require('minilog')('worker');
+
+    require('minilog').pipe(process.stdout);
+
+    log.info('Booting', { foo: 'bar' });
     log.error('FooBar');
     log('Hello', 'World');
 
@@ -42,7 +53,25 @@ Output:
     worker error FooBar
     worker Hello World
 
-## Filtering logs by namespace or level
+## Formatting / templating
+
+Formatting can be applied to pipes:
+
+    MiniLog
+      .pipe(process.stdout)
+      .format(function(name, level, args) {
+        return (name ? name.toUpperCase() + ' - ' : '')
+             + (level ? level.toUpperCase() + ' ' : '')
+             + args.join(' ') + '\n';
+      });
+
+The console logger comes with format functions inspired by [logme](https://github.com/vesln/logme).
+
+### Theme: clean
+
+
+
+## Adding filters
 
 Filters can be applied to pipes:
 
@@ -54,17 +83,11 @@ Filters can be applied to pipes:
         return whitelist[name] && type[level];
       });
 
-## Formatting
+## Global log levels via environment variables
 
-Formatting can be applied to pipes:
+TODO
 
-    MiniLog
-      .pipe(process.stdout)
-      .format(function(name, level, args) {
-        return (name ? name.toUpperCase() + ' - ' : '')
-             + (level ? level.toUpperCase() + ' ' : '')
-             + args.join(' ') + '\n';
-      });
+    $ export DEBUG=http,foo
 
 ## Counting and timing
 
