@@ -80,14 +80,6 @@ Each pipe returns a chainable config object. Formatting can be applied to pipes:
 The console logger comes with format functions inspired by [logme](https://github.com/vesln/logme).
 The withStack formatter can print the module name and current line number by examining the stack trace.
 
-## Adding annotations
-
-You can add annotations (like date, user account and so on) during the formatting step
-
-## Logging as JSON over a remote connection
-
-
-
 ## Adding filters
 
 Filters can be applied to pipes:
@@ -102,9 +94,28 @@ Filters can be applied to pipes:
 
 ## Global log levels via environment variables
 
-TODO
+The node_console backend (./backends/node_console.js) comes with a filter that you can enable to toggle global log levels via the DEBUG environment variable.
 
-    $ export DEBUG=http,foo
+Setup:
+
+    var MiniLog = require('minilog'),
+        ConsoleBackend = MiniLog.backends.nodeConsole;
+
+    MiniLog
+      .pipe(ConsoleBackend)
+      .format(ConsoleBackend.formatWithStack)
+      .filter(ConsoleBackend.filterEnv);
+
+    MiniLog('app').info('Hello world');
+    MiniLog('foo').info('Hello world');
+    MiniLog('bar').info('Hello world');
+
+Examples of whitelisting and blacklisting:
+
+    $ export DEBUG=app && node whitelist_example.js
+    app  info whitelist_example.js:13 Hello world
+    $ export DEBUG="*,-app,-bar" && node whitelist_example.js
+    foo  info whitelist_example.js:14 Hello world
 
 ## Counting and timing
 
@@ -113,11 +124,23 @@ TODO not done
     log.error('cookie problems #nocookies_for_session'); // use #event for counting
     log.info('#connected #boot_time=100'); // use #timing=value for timing
 
+## Adding annotations
+
+You can add annotations (like date, user account and so on) during the formatting step
+
 ## Using it in the browser
 
 TODO - use Glue or onejs.
 
-## Disabling logging completely
+Logging window.onerror (assuming log is a reference to a logger):
+
+    window.onerror = function(message, file, line){
+      log(file+':'+line+' '+message);
+    }
+
+## Logging as JSON over a remote connection
+
+## Disabling logging completely via your build system
 
 If your build system supports this (e.g. onejs --tie minilog="..."), use this replacement to disable logging in production builds:
 
