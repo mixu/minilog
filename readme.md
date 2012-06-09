@@ -80,7 +80,7 @@ Each pipe returns a chainable config object. Formatting can be applied to pipes:
 The console logger comes with format functions inspired by [logme](https://github.com/vesln/logme).
 The withStack formatter can print the module name and current line number by examining the stack trace.
 
-![screenshot](https://github.com/mixu/useradmin/raw/master/test/example/screenshot.png)
+![screenshot](https://github.com/mixu/minilog/raw/master/test/example/screenshot.png)
 
 ## Adding filters
 
