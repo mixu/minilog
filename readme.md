@@ -9,7 +9,7 @@
 
 Backends:
 
-- Console, file, Redis, jQuery.ajax / todo: Engine.io
+- Console, file, engine.io
 - Support for counting and timing via #event_hashtags, like Olark's [hashmonitor](https://github.com/olark/hashmonitor) ([presentation](https://speakerdeck.com/u/mjpizz/p/monitor-like-a-boss)); this is implemented as a backend
 
 # Examples
@@ -39,7 +39,7 @@ You can pipe to more than one pipe if you want.
 
 Basic usage:
 
-    var log = require('minilog')();
+    var log = require('minilog')('app');
 
     require('minilog').pipe(process.stdout);
 
@@ -49,21 +49,13 @@ Basic usage:
       .warn('warning')
       .error('this is an error message');
 
-You can namespace logs:
+Output depends on the formatter function. The node_console backend has several built-in inspired by [logme](https://github.com/vesln/logme):
 
-    var log = require('minilog')('worker');
+![screenshot](https://github.com/mixu/minilog/raw/master/test/example/screenshot.png)
 
-    require('minilog').pipe(process.stdout);
+Have a look at [./test/examples/themes_example.js](https://github.com/mixu/minilog/blob/master/test/example/themes_example.js) - basically, you pass the formatter to .pipe().format().
 
-    log.info('Booting', { foo: 'bar' });
-    log.error('FooBar');
-    log('Hello', 'World');
-
-Output:
-
-    worker info Booting {"foo":"bar"}
-    worker error FooBar
-    worker Hello World
+The withStack formatter can print the module name and current line number by examining the stack trace.
 
 ## Formatting / templating
 
@@ -76,11 +68,6 @@ Each pipe returns a chainable config object. Formatting can be applied to pipes:
              + (level ? level.toUpperCase() + ' ' : '')
              + args.join(' ') + '\n';
       });
-
-The console logger comes with format functions inspired by [logme](https://github.com/vesln/logme).
-The withStack formatter can print the module name and current line number by examining the stack trace.
-
-![screenshot](https://github.com/mixu/minilog/raw/master/test/example/screenshot.png)
 
 ## Adding filters
 
@@ -134,7 +121,7 @@ You can add annotations (like date, user account and so on) during the formattin
 
 ## Using it in the browser
 
-TODO - use glue, onejs or browserbuild.
+TODO - use Glue or onejs.
 
 Logging window.onerror (assuming log is a reference to a logger):
 
