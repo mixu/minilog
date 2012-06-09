@@ -9,7 +9,7 @@
 
 Backends:
 
-- Console, file, engine.io
+- Console, File, Redis, jQuery.ajax / todo: Engine.io
 - Support for counting and timing via #event_hashtags, like Olark's [hashmonitor](https://github.com/olark/hashmonitor) ([presentation](https://speakerdeck.com/u/mjpizz/p/monitor-like-a-boss)); this is implemented as a backend
 
 # Examples
