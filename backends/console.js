@@ -27,23 +27,31 @@ module.exports = {
   end: function() {},
   // formatting
   formatClean: function(name, level, args) {
-    return '['+new Date().toUTCString()+'] '
+    var d = new Date();
+    function pad(s) { return (s.toString().length == 1? '0'+s : s); }
+    return '['
+              +d.getFullYear()+'-'
+              +pad(d.getMonth()+1) +'-'
+              +pad(d.getDay())+' '
+              +d.toLocaleTimeString()
+            +'] '
             + (name ? name + ' ' : '')
             + (level ? level + ' ' : '')
             + args.join(' ');
   },
   formatColor: function(name, level, args) {
     var colors = { debug: 'magenta', info: 'cyan', warn: 'yellow', error: 'red' };
+    function pad(s) { return (s.toString().length == 4? ' '+s : s); }
     return (name ? name + ' ' : '')
-            + (level ? style('- ' + level.toUpperCase() + ' -', colors[level]) + ' ' : '')
+            + (level ? style('- ' + pad(level.toUpperCase()) + ' -', colors[level]) + ' ' : '')
             + args.join(' ');
   },
   formatNpm: function(name, level, args) {
     var out = {
           debug: '\033[34;40m' + 'debug' + '\033[39m ',
-          info: '\033[32m' + 'info' + '\033[39m ',
-          warn: '\033[30;41m' + 'WARN' + '\033[0m ',
-          error: '\033[31;40m' + 'ERR!' + '\033[0m '
+          info: '\033[32m' + 'info'  + '\033[39m  ',
+          warn: '\033[30;41m' + 'WARN' + '\033[0m  ',
+          error: '\033[31;40m' + 'ERR!' + '\033[0m  '
         };
     return (name ? '\033[37;40m'+ name +'\033[0m ' : '')
             + (level && out[level]? out[level] : '')
@@ -58,6 +66,32 @@ module.exports = {
         };
     return (name ? name +' ' : '')
             + (level && out[level]? out[level] : '')
+            + args.join(' ');
+  },
+  formatWithStack: function(name, level, args) {
+    var colors = { debug: 'magenta', info: 'cyan', warn: 'yellow', error: 'red' };
+    function pad(s) { return (s.toString().length == 4? ' '+s : s); }
+    function getStack() {
+      var orig = Error.prepareStackTrace;
+      Error.prepareStackTrace = function (err, stack) {
+        return stack;
+      };
+      var err = new Error;
+      Error.captureStackTrace(err, arguments.callee);
+      var stack = err.stack;
+      Error.prepareStackTrace = orig;
+      return stack;
+    }
+
+    var frame = getStack()[4];
+
+    return (name ? name + ' ' : '')
+            + (level ? style(pad(level), colors[level]) + ' ' : '')
+            + style(
+                frame.getFileName().replace(new RegExp('^.*/(.+)$'), '$1')
+                + ":" + frame.getLineNumber()
+              , 'grey')
+            + ' '
             + args.join(' ');
   }
 };

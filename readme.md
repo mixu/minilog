@@ -15,13 +15,20 @@ Backends:
 
 ## Pipes everywhere
 
-To log to the console:
+You always pipe to a writable stream. To log to the console:
 
     require('minilog').pipe(process.stdout);
 
 To log into a file:
 
     require('minilog').pipe(fs.createWriteStream('./temp.log'));
+
+To log every 30s over HTTP via jQuery.ajax:
+
+    var jQueryBackend = require('minilog').backends.jquery;
+    require('minilog').pipe(new jQueryBackend({ url: 'http://localhost/'}));
+
+You can pipe to more than one pipe if you want.
 
 ## Basic usage and namespaces
 
@@ -55,7 +62,7 @@ Output:
 
 ## Formatting / templating
 
-Formatting can be applied to pipes:
+Each pipe returns a chainable config object. Formatting can be applied to pipes:
 
     MiniLog
       .pipe(process.stdout)
@@ -66,8 +73,7 @@ Formatting can be applied to pipes:
       });
 
 The console logger comes with format functions inspired by [logme](https://github.com/vesln/logme).
-
-### Theme: clean
+The withStack formatter can print the module name and current line number by examining the stack trace.
 
 
 
@@ -99,3 +105,10 @@ TODO not done
 ## Using it in the browser
 
 TODO - use Glue or onejs.
+
+## Disabling logging completely
+
+If your build system supports this (e.g. onejs --tie minilog="..."), use this replacement to disable logging in production builds:
+
+    function minilog() { return minilog; };
+

@@ -24,3 +24,8 @@ out();
 console.log('\n== Theme: learnboost\n');
 config.format(ConsoleBackend.formatLearnboost);
 out();
+
+console.log('\n== Theme: withStack\n');
+config.format(ConsoleBackend.formatWithStack);
+out();
+
