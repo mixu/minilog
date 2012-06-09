@@ -1,8 +1,9 @@
 # minilog - features
 
 - Works in the browser and on the server
-- Very simple client (no external dependencies; less than 100 lines); looks like a readable stream/eventemitter
+- Very simple client (no external dependencies; less than 80 lines); looks like a readable stream/eventemitter
 - Backends are writable streams, simple to write new adapters
+- Formatters/themes and filters are simple functions applied to a particular pipe; ships with multiple options
 - Logs are optionally scoped/namespaced to a particular module, like TJ's [debug](https://github.com/visionmedia/debug) and can be enabled/disabled selectively
 - log.debug, log.info, log.warn, log.error
 
@@ -23,10 +24,14 @@ To log into a file:
 
     require('minilog').pipe(fs.createWriteStream('./temp.log'));
 
-To log every 30s over HTTP via jQuery.ajax:
+To log into Redis:
 
-    var jQueryBackend = require('minilog').backends.jquery;
-    require('minilog').pipe(new jQueryBackend({ url: 'http://localhost/'}));
+    var client = require('redis').createClient();
+    require('minilog').pipe(new require('minilog').backends.redis({ client: client, key: 'logs'}));
+
+To log over HTTP via jQuery.ajax:
+
+    require('minilog').pipe(new require('minilog').backends.jquery({ url: 'http://localhost/'}));
 
 You can pipe to more than one pipe if you want.
 
@@ -74,6 +79,12 @@ Each pipe returns a chainable config object. Formatting can be applied to pipes:
 
 The console logger comes with format functions inspired by [logme](https://github.com/vesln/logme).
 The withStack formatter can print the module name and current line number by examining the stack trace.
+
+## Adding annotations
+
+You can add annotations (like date, user account and so on) during the formatting step
+
+## Logging as JSON over a remote connection
 
 
 
