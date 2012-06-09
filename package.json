@@ -6,5 +6,19 @@
   "dependencies": { },
   "devDependencies": {
     "mocha": "*"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mixu/minilog.git"
+  },
+  "author": {
+    "name": "Mikito Takada",
+    "email": "mikito.takada@gmail.com",
+    "url": "http://blog.mixu.net/"
+  },
+  "keywords": [
+    "logging",
+    "sysadmin",
+    "tools"
+  ]
 }
