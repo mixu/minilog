@@ -1,5 +1,5 @@
 function jqBackend(options) {
-  this.url = options.url || 'http://localhost/';
+  this.url = options.url || 'http://localhost:8080/';
   this.cache = [];
   this.timer = null;
   this.interval = options.interval || 30*1000;
@@ -13,11 +13,17 @@ jqBackend.prototype.write = function(str) {
 jqBackend.prototype.init = function() {
   var self = this;
   this.timer = setTimeout(function() {
-    var data = this.cache;
-    this.cache = [];
-    window.$.post(self.url, data, function(data, textStatus, jqXHR) {
-      self.init();
-    }, 'json');
+    if(self.cache.length == 0) return self.init();
+
+    $.ajax(self.url, {
+      type: 'POST',
+      cache: false,
+      processData: false,
+      data: JSON.stringify(self.cache),
+      contentType: 'application/json',
+      complete: function() { self.init(); },
+    });
+    self.cache = [];
   }, this.interval);
 };
 

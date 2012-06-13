@@ -1,0 +1,43 @@
+<html>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<script src="minilog.js"></script>
+<script>
+Minilog
+  .pipe(new Minilog.backends.jquery({ url: 'http://localhost:8080/log', interval: 1000 }))
+  .pipe({
+    write: function(str) { console.log(str); },
+    end: function() {}
+  })
+  .pipe({
+    write: function(str) {
+      var el = document.getElementById('logs');
+      $(logs).append('<li>'+str+'</li>');
+    },
+    end: function() {}
+  });
+window.log = Minilog('app');
+
+function clickHandler(){
+  var el = document.getElementById('log');
+  log.info(el.value);
+  // increment counter
+  el.value = el.value.replace(/#([0-9]+)/, function(str, p1){ return '#' + (parseInt(p1, 10) + 1); });
+}
+
+</script>
+<body>
+
+<p>To add log messages, type below.</p>
+
+<input type="text" value="Log message #1" id="log" length="70">
+
+<input type="button" value="Add log message" onclick="clickHandler();">
+
+<p>Notice how the messages are piped to jQuery (at 1 second aggregation interval) and to the list below:</p>
+
+<ul id="logs">
+
+</ul>
+
+</body>
+</html>
