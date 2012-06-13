@@ -5,6 +5,16 @@ var fs = require('fs'),
 
 var server = http.createServer();
 
+var re = /\#([a-zA-Z][\w\d_]+)(?:(?:\s+|$)|\=(\-?\d+(?:\.\d+)?))/g;
+
+function count(str) {
+  var result = { msg: str };
+  str.replace(re, function(s, key, value) {
+    result.metrics || (result.metrics = {});
+    result.metrics[key] = (value ? value : 1);
+  });
+  return result;
+}
 
 server.on('request', function(req, res) {
   if(req.url == '/') {
@@ -29,7 +39,7 @@ server.on('request', function(req, res) {
       data += buf;
     }).on('end', function() {
       JSON.parse(data).forEach(function(line) {
-        console.log(line.trim());
+        process.stdout.write(JSON.stringify(count(line.trim())) + '\n');
       });
       res.end();
     });

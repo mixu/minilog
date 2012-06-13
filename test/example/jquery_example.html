@@ -2,20 +2,23 @@
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
 <script src="minilog.js"></script>
 <script>
-Minilog
-  .pipe(new Minilog.backends.jquery({ url: 'http://localhost:8080/log', interval: 1000 }))
-  .pipe({
-    write: function(str) { console.log(str); },
-    end: function() {}
-  })
-  .pipe({
-    write: function(str) {
-      var el = document.getElementById('logs');
-      $(logs).append('<li>'+str+'</li>');
-    },
-    end: function() {}
-  });
-window.log = Minilog('app');
+;(function() {
+  var jq = new Minilog.backends.jquery({ url: 'http://localhost:8080/log', interval: 1000, format: 'json' });
+  Minilog
+    .pipe(jq)
+    .pipe({
+      write: function(str) { console.log(str); },
+      end: function() {}
+    })
+    .pipe({
+      write: function(str) {
+        var el = document.getElementById('logs');
+        $(logs).append('<li>'+str+'</li>');
+      },
+      end: function() {}
+    });
+  window.log = Minilog('app');
+}());
 
 function clickHandler(){
   var el = document.getElementById('log');
