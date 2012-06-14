@@ -15,4 +15,5 @@ new Glue()
       fs.mkdirSync('./dist/');
     }
     fs.writeFileSync('./dist/minilog.js', txt);
+    console.log('Wrote ./dist/minilog.js');
   });
