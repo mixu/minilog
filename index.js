@@ -3,5 +3,6 @@ exports = module.exports = require('./minilog.js');
 exports.backends = {
 //  redis: require('./backends/redis.js'),
 //  nodeConsole: require('./backends/node_console.js'),
-  jquery: require('./backends/jquery.js')
+//  jquery: require('./backends/jquery.js')
+  browser: require('./backends/browser_console.js')
 };

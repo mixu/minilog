@@ -6,7 +6,7 @@ module.exports = {
       // and still useless for objects in IE9. But useful for non-IE browsers.
       return console.log.apply(console, arguments);
     }
-    if(!JSON.stringify) return;
+    if(!JSON || !JSON.stringify) return;
     // for IE8/9: make console.log at least a bit less awful
     var args = Array.prototype.slice.call(arguments),
         len = args.length;

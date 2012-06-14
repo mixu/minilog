@@ -1,2 +1,4 @@
 test/temp.log
 node_modules/
+test/example/hive
+dist/
