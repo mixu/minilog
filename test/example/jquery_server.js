@@ -8,7 +8,7 @@ var server = http.createServer();
 var re = /\#([a-zA-Z][\w\d_]+)(?:(?:\s+|$)|\=(\-?\d+(?:\.\d+)?))/g;
 
 function count(str) {
-  var result = { msg: str };
+  var result = { msg: str, ts: Math.round((new Date()).getTime() / 1000) };
   str.replace(re, function(s, key, value) {
     result.metrics || (result.metrics = {});
     result.metrics[key] = (value ? value : 1);
