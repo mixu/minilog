@@ -15,10 +15,35 @@ var hasBrowser = process.argv.some(function(o) { return o == 'browser'}),
     hasLocalStorage = process.argv.some(function(o) { return o == 'localstorage'}),
     hasjQuery = process.argv.some(function(o) { return o == 'jquery'});
 
+function getExports() {
+  return [
+    'exports = module.exports = require(\'./minilog.js\');',
+    'exports.backends = {',
+      [
+        (hasBrowser ? "  browser: require('./backends/browser_console.js')" : undefined ),
+        (hasLocalStorage ? "  localstorage: require('./backends/browser_localstorage.js')" : undefined ),
+        (hasjQuery ? "  jquery: require('./backends/browser_jquery.js')" : undefined ),
+      ].filter(function(v) { return !!v; }).join(',\n'),
+    '};',
+    '// allows you to enable logging via localstorage,',
+    '// do "window.localStorage.minilogSettings = JSON.stringify([\'browser\']);"',
+    "if(typeof window != 'undefined' && window.localStorage &&",
+    "   typeof JSON != 'undefined' && JSON.parse &&",
+    "   window.localStorage.minilogSettings) {",
+    "  var enabled = JSON.parse(window.localStorage.minilogSettings);",
+    "  for(var i = 0; i < enabled.length; i++) {",
+    "    if (exports.backends[enabled[i]]) {",
+    "      exports.pipe(exports.backends[enabled[i]]);",
+    "    }",
+    "  }",
+    "}"
+    ].join('\n');
+}
+
+
 var build = new Glue()
   .basepath('./')
-  .include('./browser_index.js')
-  .main('browser_index.js')
+  .define('index.js', getExports())
   .include('./minilog.js');
 
 if(hasBrowser) {
