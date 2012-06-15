@@ -9,7 +9,8 @@
 
 Backends:
 
-- Console, File, Redis, jQuery.ajax / todo: Engine.io
+- Node.js: Console, File, Redis
+- In browser: Console, LocalStorage, jQuery.ajax (todo: Engine.io)
 - Support for counting and timing via #event_hashtags, like Olark's [hashmonitor](https://github.com/olark/hashmonitor) ([presentation](https://speakerdeck.com/u/mjpizz/p/monitor-like-a-boss)); this is implemented as a backend
 
 # Examples
@@ -121,7 +122,11 @@ You can add annotations (like date, user account and so on) during the formattin
 
 ## Using it in the browser
 
-TODO - use Glue or onejs.
+There is a included build.js file for gluejs. Run node build.js to create ./dist/minilog.js
+
+To enable logging, pipe it from the browser console:
+
+    Minilog.pipe(Minilog.backends.browser);
 
 Logging window.onerror (assuming log is a reference to a logger):
 

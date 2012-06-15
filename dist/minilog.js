@@ -7,8 +7,23 @@ exports.backends = {
 //  redis: require('./backends/redis.js'),
 //  nodeConsole: require('./backends/node_console.js'),
 //  jquery: require('./backends/jquery.js')
-  browser: require('./backends/browser_console.js')
+  browser: require('./backends/browser_console.js'),
+  localstorage: require('./backends/browser_localstorage.js')
 };
+
+// allows you to enable logging from the very start
+// by doing "window.localStorage.minilogSettings = JSON.stringify(['browser']);"
+// this will start logging immediately
+if(typeof window != 'undefined' && window.localStorage &&
+   typeof JSON != 'undefined' && JSON.parse &&
+   window.localStorage.minilogSettings) {
+  var enabled = JSON.parse(window.localStorage.minilogSettings);
+  for(var i = 0; i < enabled.length; i++) {
+    if (exports.backends[enabled[i]]) {
+      exports.pipe(exports.backends[enabled[i]]);
+    }
+  }
+}
 
 };require.modules['minilog.js'] = function(module, exports, require, global){
 var callbacks = [],
@@ -104,6 +119,20 @@ module.exports = {
       args[i] = JSON.stringify(args[i]);
     }
     console.log(args.join(' '));
+  },
+  end: function() {}
+};
+
+};require.modules['backends/browser_localstorage.js'] = function(module, exports, require, global){
+var cache = false;
+
+module.exports = {
+  write: function(str) {
+    if(typeof window == 'undefined' || !window.localStorage ||
+       typeof JSON == 'undefined' || !JSON.stringify) return;
+    if(!cache) { cache = window.localStorage.minilog || []; }
+    cache.push(new Date().toString() + ' '+ str);
+    window.localStorage.minilog = JSON.stringify(cache);
   },
   end: function() {}
 };
