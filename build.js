@@ -17,7 +17,8 @@ var hasBrowser = process.argv.some(function(o) { return o == 'browser'}),
 
 var build = new Glue()
   .basepath('./')
-  .include('./index.js')
+  .include('./browser_index.js')
+  .main('browser_index.js')
   .include('./minilog.js');
 
 if(hasBrowser) {

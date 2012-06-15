@@ -1,12 +1,9 @@
 (function(){var global = this;function require(p, parent){ var path = require.resolve(p) , mod = require.modules[path]; if (!mod) throw new Error('failed to require "' + p + '" from ' + parent); if (!mod.exports) { mod.exports = {}; mod.call(mod.exports, mod, mod.exports, require.relative(path), global); } return mod.exports;}require.modules = {};require.resolve = function(path){ var orig = path , reg = path + '.js' , index = path + '/index.js'; return require.modules[reg] && reg || require.modules[index] && index || orig;};require.relative = function(parent) { return function(p){ if ('debug' == p) return debug; if ('.' != p.charAt(0)) return require(p); var path = parent.split('/') , segs = p.split('/'); path.pop(); for (var i = 0; i < segs.length; i++) { var seg = segs[i]; if ('..' == seg) path.pop(); else if ('.' != seg) path.push(seg); } return require(path.join('/'), parent); };};
 require.modules["jquery"] = { exports: window.$ };
-require.modules['index.js'] = function(module, exports, require, global){
+require.modules['browser_index.js'] = function(module, exports, require, global){
 exports = module.exports = require('./minilog.js');
 
 exports.backends = {
-//  redis: require('./backends/redis.js'),
-//  nodeConsole: require('./backends/node_console.js'),
-//  jquery: require('./backends/jquery.js')
   browser: require('./backends/browser_console.js'),
   localstorage: require('./backends/browser_localstorage.js')
 };
@@ -129,13 +126,13 @@ var cache = false;
 module.exports = {
   write: function(str) {
     if(typeof window == 'undefined' || !window.localStorage ||
-       typeof JSON == 'undefined' || !JSON.stringify) return;
-    if(!cache) { cache = window.localStorage.minilog || []; }
+       typeof JSON == 'undefined' || !JSON.stringify || !JSON.parse) return;
+    if(!cache) { cache = (window.localStorage.minilog ? JSON.parse(window.localStorage.minilog) : []); }
     cache.push(new Date().toString() + ' '+ str);
     window.localStorage.minilog = JSON.stringify(cache);
   },
   end: function() {}
 };
 
-};Minilog = require('index.js');
+};Minilog = require('browser_index.js');
 })();
