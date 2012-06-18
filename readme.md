@@ -94,7 +94,8 @@ Setup:
     MiniLog
       .pipe(ConsoleBackend)
       .format(ConsoleBackend.formatWithStack)
-      .filter(ConsoleBackend.filterEnv);
+      // pass the content of the variable - allows you to a custom variable
+      .filter(ConsoleBackend.filterEnv(process.env.DEBUG));
 
     MiniLog('app').info('Hello world');
     MiniLog('foo').info('Hello world');

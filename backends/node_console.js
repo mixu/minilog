@@ -17,21 +17,6 @@ var styles = {
   'yellow'    : ['\033[33m', '\033[39m']
 };
 
-var whitelist = [],
-    blacklist = [];
-
-// Adapted from visionmedia's debug:
-(process.env.DEBUG || '')
-  .split(/[\s,]+/)
-  .forEach(function(name){
-    name = name.replace('*', '.*?');
-    if (name[0] === '-') {
-      blacklist.push(new RegExp('^' + name.substr(1) + '$'));
-    } else {
-      whitelist.push(new RegExp('^' + name + '$'));
-    }
-  });
-
 function style(str, style) {
   return styles[style][0] + str + styles[style][1];
 }
@@ -41,23 +26,31 @@ module.exports = {
   write: function(str) { console.log(str); },
   end: function() {},
   // filter which allows you to disable logging selectively via process.ENV
-  filterEnv: function(name) {
-    function match(re) {
-      return re.test(name);
+  // Note: invoke with the name of your ENV or a string
+  filterEnv: function(envStr) {
+    var whitelist = [],
+        blacklist = [];
+    // Adapted from visionmedia's debug:
+    (envStr || '')
+      .split(/[\s,]+/)
+      .forEach(function(name){
+        name = name.replace('*', '.*?');
+        if (name[0] === '-') {
+          blacklist.push(new RegExp('^' + name.substr(1) + '$'));
+        } else {
+          whitelist.push(new RegExp('^' + name + '$'));
+        }
+      });
+    function filter(name) {
+      function match(re) { return re.test(name); }
+      return !blacklist.some(match) && whitelist.some(match);
     }
-    return !blacklist.some(match) && whitelist.some(match);
+    return filter;
   },
   // formatting
   formatClean: function(name, level, args) {
-    var d = new Date();
     function pad(s) { return (s.toString().length == 1? '0'+s : s); }
-    return '['
-              +d.getFullYear()+'-'
-              +pad(d.getMonth()+1) +'-'
-              +pad(d.getDay())+' '
-              +d.toLocaleTimeString()
-            +'] '
-            + (name ? name + ' ' : '')
+    return (name ? name + ' ' : '')
             + (level ? level + ' ' : '')
             + args.join(' ');
   },
