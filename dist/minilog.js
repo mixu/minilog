@@ -1,7 +1,15 @@
 (function(){var global = this;function require(p, parent){ var path = require.resolve(p) , mod = require.modules[path]; if (!mod) throw new Error('failed to require "' + p + '" from ' + parent); if (!mod.exports) { mod.exports = {}; mod.call(mod.exports, mod, mod.exports, require.relative(path), global); } return mod.exports;}require.modules = {};require.resolve = function(path){ var orig = path , reg = path + '.js' , index = path + '/index.js'; return require.modules[reg] && reg || require.modules[index] && index || orig;};require.relative = function(parent) { return function(p){ if ('debug' == p) return debug; if ('.' != p.charAt(0)) return require(p); var path = parent.split('/') , segs = p.split('/'); path.pop(); for (var i = 0; i < segs.length; i++) { var seg = segs[i]; if ('..' == seg) path.pop(); else if ('.' != seg) path.push(seg); } return require(path.join('/'), parent); };};
 require.modules["jquery"] = { exports: window.$ };
 require.modules['index.js'] = function(module, exports, require, global){
-exports = module.exports = require('./minilog.js');
+var Minilog = require('./minilog.js');
+// default formatter for browser
+Minilog.format = function format(name, level, args) {
+  var prefix = [];
+  if(name) prefix.push(name);
+  if(level) prefix.push(level);
+ return prefix.concat(args).join(' ');
+}
+exports = module.exports = Minilog;
 exports.backends = {
   browser: require('./backends/browser_console.js'),
   localstorage: require('./backends/browser_localstorage.js')
@@ -20,7 +28,8 @@ if(typeof window != 'undefined' && window.localStorage &&
 }
 };require.modules['minilog.js'] = function(module, exports, require, global){
 var callbacks = [],
-    log = { readable: true };
+    log = { readable: true },
+    def = { format: function() { return ''; } };
 
 log.on = log.addListener = function(ev, callback) {
   callbacks[ev] || (callbacks[ev] = []);
@@ -36,17 +45,14 @@ log.emit = function(ev) {
   }
 };
 
-log.removeListener = function(ev, callback) {
+log.removeListener = log.removeAllListeners = function(ev, callback) {
   if(!callbacks[ev]) return;
+  if(!callback) { delete callbacks[ev]; return; }
   for(var i = callbacks[ev].length-1; i >= 0; i--) {
     if(callbacks[ev][i] == callback) {
       callbacks[ev].splice(i, 1);
     }
   }
-};
-
-log.removeAllListeners = function(ev) {
-  delete callbacks[ev];
 };
 
 function serialize(args) {
@@ -67,20 +73,15 @@ exports = module.exports = function create(name) {
   return o;
 };
 
+exports.format = function(formatter) {
+  def.format = formatter;
+};
+
 exports.pipe = function(dest) {
   var config = {};
   log.on('item', function(name, level, args) {
-    if(config.filter && !config.filter(name, level)) {
-      return;
-    }
-    if(config.format) {
-      dest.write(config.format(name, level, args));
-    } else {
-      var prefix = [];
-      if(name) prefix.push(name);
-      if(level) prefix.push(level);
-      dest.write(prefix.concat(args).join(' ') + '\n');
-    }
+    if(config.filter && !config.filter(name, level)) return;
+    dest.write((config.format ? config : def).format(name, level, args));
   }).on('end', function() { !dest._isStdio && dest.end(); });
   var chain = {
     filter: function(cb) { config.filter = cb; return chain; },

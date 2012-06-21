@@ -23,7 +23,7 @@ function getExports() {
     '  var prefix = [];',
     '  if(name) prefix.push(name);',
     '  if(level) prefix.push(level);',
-    ' return prefix.concat(args).join(' ');',
+    ' return prefix.concat(args).join(\' \');',
     '}',
     'exports = module.exports = Minilog;',
     'exports.backends = {',
