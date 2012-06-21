@@ -3,12 +3,12 @@ require.modules["jquery"] = { exports: window.$ };
 require.modules['index.js'] = function(module, exports, require, global){
 var Minilog = require('./minilog.js');
 // default formatter for browser
-Minilog.format = function format(name, level, args) {
+Minilog.format(function(name, level, args) {
   var prefix = [];
   if(name) prefix.push(name);
   if(level) prefix.push(level);
  return prefix.concat(args).join(' ');
-}
+});
 exports = module.exports = Minilog;
 exports.backends = {
   browser: require('./backends/browser_console.js'),
