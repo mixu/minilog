@@ -17,7 +17,15 @@ var hasBrowser = process.argv.some(function(o) { return o == 'browser'}),
 
 function getExports() {
   return [
-    'exports = module.exports = require(\'./minilog.js\');',
+    'var Minilog = require(\'./minilog.js\');',
+    '// default formatter for browser',
+    'Minilog.format = function format(name, level, args) {',
+    '  var prefix = [];',
+    '  if(name) prefix.push(name);',
+    '  if(level) prefix.push(level);',
+    ' return prefix.concat(args).join(' ');',
+    '}',
+    'exports = module.exports = Minilog;',
     'exports.backends = {',
       [
         (hasBrowser ? "  browser: require('./backends/browser_console.js')" : undefined ),
@@ -39,7 +47,6 @@ function getExports() {
     "}"
     ].join('\n');
 }
-
 
 var build = new Glue()
   .basepath('./')

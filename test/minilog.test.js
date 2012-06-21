@@ -1,6 +1,6 @@
 var fs = require('fs'),
     assert = require('assert'),
-    MiniLog = require('../minilog.js');
+    MiniLog = require('../index.js');
 
 function WriteStream() {
   var self = this;
@@ -56,15 +56,15 @@ exports['given a minilog'] = {
     done();
   },
 
-  'can use log.error, log.warn, log.info, log.trace': function(done) {
+  'can use log.error, log.warn, log.info, log.debug': function(done) {
     this.log.error('aaa');
     assert.equal(this.stream.content[0], 'error aaa\n');
     this.log.warn('aaa');
     assert.equal(this.stream.content[1], 'warn aaa\n');
     this.log.info('aaa');
     assert.equal(this.stream.content[2], 'info aaa\n');
-    this.log.trace('aaa');
-    assert.equal(this.stream.content[3], 'trace aaa\n');
+    this.log.debug('aaa');
+    assert.equal(this.stream.content[3], 'debug aaa\n');
     done();
   },
 
@@ -78,8 +78,8 @@ exports['given a minilog'] = {
     assert.equal(this.stream.content[2], 'ns warn aaa\n');
     this.log.info('aaa');
     assert.equal(this.stream.content[3], 'ns info aaa\n');
-    this.log.trace('aaa');
-    assert.equal(this.stream.content[4], 'ns trace aaa\n');
+    this.log.debug('aaa');
+    assert.equal(this.stream.content[4], 'ns debug aaa\n');
     done();
   },
 

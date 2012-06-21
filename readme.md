@@ -70,6 +70,8 @@ Each pipe returns a chainable config object. Formatting can be applied to pipes:
              + args.join(' ') + '\n';
       });
 
+You can set the default formatter via Minilog.format(fn).
+
 ## Adding filters
 
 Filters can be applied to pipes:

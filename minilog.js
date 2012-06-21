@@ -1,5 +1,6 @@
 var callbacks = [],
-    log = { readable: true };
+    log = { readable: true },
+    def = { format: function() { return ''; } };
 
 log.on = log.addListener = function(ev, callback) {
   callbacks[ev] || (callbacks[ev] = []);
@@ -15,17 +16,14 @@ log.emit = function(ev) {
   }
 };
 
-log.removeListener = function(ev, callback) {
+log.removeListener = log.removeAllListeners = function(ev, callback) {
   if(!callbacks[ev]) return;
+  if(!callback) { delete callbacks[ev]; return; }
   for(var i = callbacks[ev].length-1; i >= 0; i--) {
     if(callbacks[ev][i] == callback) {
       callbacks[ev].splice(i, 1);
     }
   }
-};
-
-log.removeAllListeners = function(ev) {
-  delete callbacks[ev];
 };
 
 function serialize(args) {
@@ -46,20 +44,15 @@ exports = module.exports = function create(name) {
   return o;
 };
 
+exports.format = function(formatter) {
+  def.format = formatter;
+};
+
 exports.pipe = function(dest) {
   var config = {};
   log.on('item', function(name, level, args) {
-    if(config.filter && !config.filter(name, level)) {
-      return;
-    }
-    if(config.format) {
-      dest.write(config.format(name, level, args));
-    } else {
-      var prefix = [];
-      if(name) prefix.push(name);
-      if(level) prefix.push(level);
-      dest.write(prefix.concat(args).join(' ') + '\n');
-    }
+    if(config.filter && !config.filter(name, level)) return;
+    dest.write((config.format ? config : def).format(name, level, args));
   }).on('end', function() { !dest._isStdio && dest.end(); });
   var chain = {
     filter: function(cb) { config.filter = cb; return chain; },
