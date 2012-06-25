@@ -23,7 +23,7 @@ function style(str, style) {
 
 module.exports = {
   // backend
-  write: function(str) { console.log(str); },
+  write: function(str) { console.log(str.trim()); },
   end: function() {},
   // filter which allows you to disable logging selectively via process.ENV
   // Note: invoke with the name of your ENV or a string
