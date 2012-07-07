@@ -68,7 +68,7 @@ build
   .export('Minilog')
   .render(function (err, txt) {
     if(err) throw err;
-    if(!path.existsSync('./dist')) {
+    if(!fs.existsSync('./dist')) {
       fs.mkdirSync('./dist/');
     }
     fs.writeFileSync('./dist/minilog.js', txt);
