@@ -6,6 +6,7 @@ if(process.argv.length < 3) {
   console.log('Usage: node build.js <backend> <backend> ...');
   console.log('where backend is one of the following:');
   console.log('\t browser - Log to the browser console');
+  console.log('\t array - Log to a array (e.g. for accessing the history)');
   console.log('\t localstorage - Log to localstorage');
   console.log('\t jquery - Log via jQuery.ajax to the server');
   return;
@@ -13,6 +14,7 @@ if(process.argv.length < 3) {
 
 var hasBrowser = process.argv.some(function(o) { return o == 'browser'}),
     hasLocalStorage = process.argv.some(function(o) { return o == 'localstorage'}),
+    hasArray = process.argv.some(function(o) { return o == 'array'}),
     hasjQuery = process.argv.some(function(o) { return o == 'jquery'});
 
 function getExports() {
@@ -53,6 +55,9 @@ var build = new Glue()
   .define('index.js', getExports())
   .include('./minilog.js');
 
+if(hasArray) {
+  build.include('./backends/array.js');
+}
 if(hasBrowser) {
   build.include('./backends/browser_console.js');
 }

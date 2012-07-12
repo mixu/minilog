@@ -10,7 +10,7 @@
 Backends:
 
 - Node.js: Console, File, Redis
-- In browser: Console, LocalStorage, jQuery.ajax (todo: Engine.io)
+- In browser: Console, Array (e.g. for a history of log lines), LocalStorage, jQuery.ajax (todo: Engine.io)
 - Support for counting and timing via #event_hashtags, like Olark's [hashmonitor](https://github.com/olark/hashmonitor) ([presentation](https://speakerdeck.com/u/mjpizz/p/monitor-like-a-boss)); this is implemented as a backend
 
 # Examples

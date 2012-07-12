@@ -59,7 +59,14 @@ function serialize(args) {
   var items = Array.prototype.slice.call(args);
   if(!JSON || !JSON.stringify) return items;
   for(var i = 0; i < items.length; i++) {
-    if(typeof items[i] == 'object') { items[i] = JSON.stringify(items[i]); }
+    if(typeof items[i] == 'object') {
+      // Buffers in Node.js look bad when stringified
+      if(items[i].constructor && items[i].constructor.isBuffer) {
+        items[i] = items[i].toString();
+      } else {
+        items[i] = JSON.stringify(items[i]);
+      }
+    }
   }
   return items;
 }
@@ -94,6 +101,19 @@ exports.pipe = function(dest) {
 exports.end = function() {
   log.emit('end');
   callbacks = [];
+};
+
+};require.modules['backends/array.js'] = function(module, exports, require, global){
+var cache = [ ];
+
+module.exports = {
+  write: function(str) {
+    cache.push(str);
+  },
+  end: function() {},
+  // utility functions
+  get: function() { return cache; },
+  empty: function() { cache = []; }
 };
 
 };require.modules['backends/browser_console.js'] = function(module, exports, require, global){
