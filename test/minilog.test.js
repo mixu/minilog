@@ -127,13 +127,19 @@ exports['given a minilog'] = {
     assert.equal(this.stream.content[1], 'WARN - aaa\n');
     assert.equal(this.stream.content[2], 'INFO - aaa\n');
     done();
+  },
+
+  'logging a buffer doesn\'t look horrible': function(done) {
+    this.log(new Buffer('Hello world'));
+    assert.equal(this.stream.content[0], 'Hello world\n');
+    done();
   }
 
 };
 
 // if this module is the script being run, then run the tests:
 if (module == require.main) {
-  var mocha = require('child_process').spawn('mocha', [ '--colors', '--ui', 'exports', '--reporter', 'spec', __filename ]);
+  var mocha = require('child_process').spawn('../node_modules/.bin/mocha', [ '--colors', '--ui', 'exports', '--reporter', 'spec', __filename ]);
   mocha.stdout.pipe(process.stdout);
   mocha.stderr.pipe(process.stderr);
 }
