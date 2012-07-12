@@ -12,6 +12,7 @@ Minilog.format(function(name, level, args) {
 exports = module.exports = Minilog;
 exports.backends = {
   browser: require('./backends/browser_console.js'),
+  array: require('./backends/array.js'),
   localstorage: require('./backends/browser_localstorage.js')
 };
 // allows you to enable logging via localstorage,

@@ -31,6 +31,7 @@ function getExports() {
     'exports.backends = {',
       [
         (hasBrowser ? "  browser: require('./backends/browser_console.js')" : undefined ),
+        (hasArray ? "  array: require('./backends/array.js')" : undefined ),
         (hasLocalStorage ? "  localstorage: require('./backends/browser_localstorage.js')" : undefined ),
         (hasjQuery ? "  jquery: require('./backends/browser_jquery.js')" : undefined ),
       ].filter(function(v) { return !!v; }).join(',\n'),
