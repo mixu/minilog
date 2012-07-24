@@ -128,9 +128,7 @@ Note that this functionality is just for the pipe to the browser console. If you
 
 ## Filtering - Node
 
-The node_console backend (./backends/node_console.js) comes with a filter that you can enable to toggle global log levels via the DEBUG environment variable.
-
-Setup:
+The node_console backend (./backends/node_console.js) comes with a filter that works like the in-browser filter, except it requires that you pass it a value - usually an environment variable:
 
     var MiniLog = require('minilog'),
         ConsoleBackend = MiniLog.backends.nodeConsole;
@@ -138,21 +136,14 @@ Setup:
     MiniLog
       .pipe(ConsoleBackend)
       .format(ConsoleBackend.formatWithStack)
-      // pass the content of the variable - allows you to a custom variable
-      .filter(ConsoleBackend.filterEnv(process.env.DEBUG));
+      .filter(ConsoleBackend.filterEnv(process.env.MYENV));
 
-    MiniLog('app').info('Hello world');
-    MiniLog('foo').info('Hello world');
-    MiniLog('bar').info('Hello world');
+Examples:
+
+    $ export MYENV="foo.*" && node whitelist_example.js
+    foo  info whitelist_example.js:14 Hello world
 
 Note that filters are applied to each pipe individually, so if you have two pipes, you need to set the filter on both (or you can use different filters).
-
-Examples of whitelisting and blacklisting:
-
-    $ export DEBUG=app && node whitelist_example.js
-    app  info whitelist_example.js:13 Hello world
-    $ export DEBUG="*,-app,-bar" && node whitelist_example.js
-    foo  info whitelist_example.js:14 Hello world
 
 ## Themes - Node
 
