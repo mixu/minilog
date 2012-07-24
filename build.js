@@ -22,10 +22,10 @@ function getExports() {
           .readFileSync('./lib/browser/index.js')
           .toString()
           .replace('%backends_block%', [
-            (hasBrowser ? "  browser: require('./backends/browser_console.js')" : undefined ),
-            (hasArray ? "  array: require('./backends/array.js')" : undefined ),
-            (hasLocalStorage ? "  localstorage: require('./backends/browser_localstorage.js')" : undefined ),
-            (hasjQuery ? "  jquery: require('./backends/browser_jquery.js')" : undefined ),
+            (hasBrowser ? "  browser: require('./lib/browser/console.js')" : undefined ),
+            (hasArray ? "  array: require('./lib/browser/array.js')" : undefined ),
+            (hasLocalStorage ? "  localstorage: require('./lib/browser/localstorage.js')" : undefined ),
+            (hasjQuery ? "  jquery: require('./lib/browser/jquery.js')" : undefined ),
           ].filter(function(v) { return !!v; }).join(',\n'));
 }
 
@@ -35,16 +35,16 @@ var build = new Glue()
   .include('./minilog.js');
 
 if(hasArray) {
-  build.include('./backends/array.js');
+  build.include('./lib/browser/array.js');
 }
 if(hasBrowser) {
-  build.include('./backends/browser_console.js');
+  build.include('./lib/browser/console.js');
 }
 if(hasLocalStorage) {
-  build.include('./backends/browser_localstorage.js');
+  build.include('./lib/browser/localstorage.js');
 }
 if(hasjQuery) {
-  build.include('./backends/browser_jquery.js');
+  build.include('./lib/browser/jquery.js');
 }
 
 build

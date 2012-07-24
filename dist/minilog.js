@@ -1,7 +1,7 @@
 (function(){var global = this;function require(p, parent){ var path = require.resolve(p) , mod = require.modules[path]; if (!mod) throw new Error('failed to require "' + p + '" from ' + parent); if (!mod.exports) { mod.exports = {}; mod.call(mod.exports, mod, mod.exports, require.relative(path), global); } return mod.exports;}require.modules = {};require.resolve = function(path){ var orig = path , reg = path + '.js' , index = path + '/index.js'; return require.modules[reg] && reg || require.modules[index] && index || orig;};require.relative = function(parent) { return function(p){ if ('debug' == p) return debug; if ('.' != p.charAt(0)) return require(p); var path = parent.split('/') , segs = p.split('/'); path.pop(); for (var i = 0; i < segs.length; i++) { var seg = segs[i]; if ('..' == seg) path.pop(); else if ('.' != seg) path.push(seg); } return require(path.join('/'), parent); };};
 require.modules["jquery"] = { exports: window.$ };
-require.modules['index.js'] = function(module, exports, require, global){
-var Minilog = require('./minilog.js');
+require.modules['index.js'] = function(module, exports, require, global){var Minilog = require('./minilog.js');
+
 // default formatter for browser
 Minilog.format(function(name, level, args) {
   var prefix = [];
@@ -9,26 +9,98 @@ Minilog.format(function(name, level, args) {
   if(level) prefix.push(level);
  return prefix.concat(args).join(' ');
 });
-exports = module.exports = Minilog;
-exports.backends = {
-  browser: require('./backends/browser_console.js'),
-  array: require('./backends/array.js'),
-  localstorage: require('./backends/browser_localstorage.js')
-};
-// allows you to enable logging via localstorage,
-// do "window.localStorage.minilogSettings = JSON.stringify(['browser']);"
-if(typeof window != 'undefined' && window.localStorage &&
-   typeof JSON != 'undefined' && JSON.parse &&
-   window.localStorage.minilogSettings) {
-  var enabled = JSON.parse(window.localStorage.minilogSettings);
-  for(var i = 0; i < enabled.length; i++) {
-    if (exports.backends[enabled[i]]) {
-      exports.pipe(exports.backends[enabled[i]]);
+
+// support for enabling() console logging easily
+var enabled = false, whitelist = [], levelMap = { debug: 1, info: 2, warn: 3, error: 4 };
+
+function filter(name, level) {
+  var i, expr;
+  for(i = 0; i < whitelist.length; i++) {
+    expr = whitelist[i];
+    if (expr.topic && expr.topic.test(name) && levelMap[level] >= expr.level) {
+      return true;
     }
   }
+  return false;
 }
-};require.modules['minilog.js'] = function(module, exports, require, global){
-var callbacks = [],
+
+Minilog.enable = function(str) {
+  if(!enabled) { Minilog.pipe(Minilog.backends.browser).filter(filter); }
+  enabled = true;
+  whitelist = [];
+  var parts = (str || '*.debug').split(/[\s,]+/), i, expr;
+  for(i = 0; i < parts.length; i++) {
+    expr = parts[i].split('.');
+    if(expr.length > 2) { expr = [ expr.slice(0, -1).join('.'), expr.slice(-1).join() ]; }
+    whitelist.push({ topic: new RegExp('^'+expr[0].replace('*', '.*')), level: levelMap[expr[1]] || 1 });
+  }
+  if(typeof window != 'undefined' && window.localStorage) {
+    window.localStorage.minilogSettings = JSON.stringify(str);
+  }
+};
+
+// apply enable inputs from localStorage and from the URL
+if(typeof window != 'undefined') {
+  if(window.localStorage && window.localStorage.minilogSettings) {
+    Minilog.enable(JSON.stringify(str));
+  }
+  if(window.location && window.location.search) {
+    var match = RegExp('[?&]minilog=([^&]*)').exec(window.location.search);
+    match && Minilog.enable(decodeURIComponent(match[1]));
+  }
+}
+
+exports = module.exports = Minilog;
+exports.backends = {   browser: require('./lib/browser/console.js'),
+  array: require('./lib/browser/array.js'),
+  localstorage: require('./lib/browser/localstorage.js') };
+};
+require.modules['lib/browser/array.js'] = function(module, exports, require, global){var cache = [ ];
+
+module.exports = {
+  write: function(str) {
+    cache.push(str);
+  },
+  end: function() {},
+  // utility functions
+  get: function() { return cache; },
+  empty: function() { cache = []; }
+};
+};
+require.modules['lib/browser/console.js'] = function(module, exports, require, global){module.exports = {
+  write: function(str) {
+    if (typeof console === 'undefined' || !console.log) return;
+    if (console.log.apply) {
+      // console.log.apply is undefined in IE8 and IE9
+      // and still useless for objects in IE9. But useful for non-IE browsers.
+      return console.log.apply(console, arguments);
+    }
+    if(!JSON || !JSON.stringify) return;
+    // for IE8/9: make console.log at least a bit less awful
+    var args = Array.prototype.slice.call(arguments),
+        len = args.length;
+    for(var i = 0; i < len; i++) {
+      args[i] = JSON.stringify(args[i]);
+    }
+    console.log(args.join(' '));
+  },
+  end: function() {}
+};
+};
+require.modules['lib/browser/localstorage.js'] = function(module, exports, require, global){var cache = false;
+
+module.exports = {
+  write: function(str) {
+    if(typeof window == 'undefined' || !window.localStorage ||
+       typeof JSON == 'undefined' || !JSON.stringify || !JSON.parse) return;
+    if(!cache) { cache = (window.localStorage.minilog ? JSON.parse(window.localStorage.minilog) : []); }
+    cache.push(new Date().toString() + ' '+ str);
+    window.localStorage.minilog = JSON.stringify(cache);
+  },
+  end: function() {}
+};
+};
+require.modules['minilog.js'] = function(module, exports, require, global){var callbacks = [],
     log = { readable: true },
     def = { format: function() { return ''; } };
 
@@ -103,54 +175,6 @@ exports.end = function() {
   log.emit('end');
   callbacks = [];
 };
-
-};require.modules['backends/array.js'] = function(module, exports, require, global){
-var cache = [ ];
-
-module.exports = {
-  write: function(str) {
-    cache.push(str);
-  },
-  end: function() {},
-  // utility functions
-  get: function() { return cache; },
-  empty: function() { cache = []; }
 };
-
-};require.modules['backends/browser_console.js'] = function(module, exports, require, global){
-module.exports = {
-  write: function(str) {
-    if (typeof console === 'undefined' || !console.log) return;
-    if (console.log.apply) {
-      // console.log.apply is undefined in IE8 and IE9
-      // and still useless for objects in IE9. But useful for non-IE browsers.
-      return console.log.apply(console, arguments);
-    }
-    if(!JSON || !JSON.stringify) return;
-    // for IE8/9: make console.log at least a bit less awful
-    var args = Array.prototype.slice.call(arguments),
-        len = args.length;
-    for(var i = 0; i < len; i++) {
-      args[i] = JSON.stringify(args[i]);
-    }
-    console.log(args.join(' '));
-  },
-  end: function() {}
-};
-
-};require.modules['backends/browser_localstorage.js'] = function(module, exports, require, global){
-var cache = false;
-
-module.exports = {
-  write: function(str) {
-    if(typeof window == 'undefined' || !window.localStorage ||
-       typeof JSON == 'undefined' || !JSON.stringify || !JSON.parse) return;
-    if(!cache) { cache = (window.localStorage.minilog ? JSON.parse(window.localStorage.minilog) : []); }
-    cache.push(new Date().toString() + ' '+ str);
-    window.localStorage.minilog = JSON.stringify(cache);
-  },
-  end: function() {}
-};
-
-};Minilog = require('index.js');
+Minilog = require('index.js');
 })();
