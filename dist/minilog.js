@@ -1,6 +1,6 @@
-(function(){var global = this;function require(p, parent){ var path = require.resolve(p) , mod = require.modules[path]; if (!mod) throw new Error('failed to require "' + p + '" from ' + parent); if (!mod.exports) { mod.exports = {}; mod.call(mod.exports, mod, mod.exports, require.relative(path), global); } return mod.exports;}require.modules = {};require.resolve = function(path){ var orig = path , reg = path + '.js' , index = path + '/index.js'; return require.modules[reg] && reg || require.modules[index] && index || orig;};require.relative = function(parent) { return function(p){ if ('debug' == p) return debug; if ('.' != p.charAt(0)) return require(p); var path = parent.split('/') , segs = p.split('/'); path.pop(); for (var i = 0; i < segs.length; i++) { var seg = segs[i]; if ('..' == seg) path.pop(); else if ('.' != seg) path.push(seg); } return require(path.join('/'), parent); };};
+(function(){function require(p, parent){ var path = require.resolve(p) , mod = require.modules[path]; if (!mod) throw new Error('failed to require "' + p + '" from ' + parent); if (!mod.exports) { mod.exports = {}; mod.call(mod.exports, mod, mod.exports, require.relative(path)); } return mod.exports;}require.modules = {};require.resolve = function(path){ var orig = path , reg = path + '.js' , index = path + '/index.js'; return require.modules[reg] && reg || require.modules[index] && index || orig;};require.relative = function(parent) { return function(p){ if ('.' != p.charAt(0)) return require(p); var path = parent.split('/') , segs = p.split('/'); path.pop(); for (var i = 0; i < segs.length; i++) { var seg = segs[i]; if ('..' == seg) path.pop(); else if ('.' != seg) path.push(seg); } return require(path.join('/'), parent); };};
 require.modules["jquery"] = { exports: window.$ };
-require.modules['index.js'] = function(module, exports, require, global){var Minilog = require('./minilog.js');
+require.modules['index.js'] = function(module, exports, require){var Minilog = require('./minilog.js');
 
 // default formatter for browser
 Minilog.format(function(name, level, args) {
@@ -42,7 +42,7 @@ Minilog.enable = function(str) {
 // apply enable inputs from localStorage and from the URL
 if(typeof window != 'undefined') {
   if(window.localStorage && window.localStorage.minilogSettings) {
-    Minilog.enable(JSON.stringify(str));
+    Minilog.enable(JSON.stringify(window.localStorage.minilogSettings));
   }
   if(window.location && window.location.search) {
     var match = RegExp('[?&]minilog=([^&]*)').exec(window.location.search);
@@ -55,7 +55,7 @@ exports.backends = {   browser: require('./lib/browser/console.js'),
   array: require('./lib/browser/array.js'),
   localstorage: require('./lib/browser/localstorage.js') };
 };
-require.modules['lib/browser/array.js'] = function(module, exports, require, global){var cache = [ ];
+require.modules['lib/browser/array.js'] = function(module, exports, require){var cache = [ ];
 
 module.exports = {
   write: function(str) {
@@ -67,7 +67,7 @@ module.exports = {
   empty: function() { cache = []; }
 };
 };
-require.modules['lib/browser/console.js'] = function(module, exports, require, global){module.exports = {
+require.modules['lib/browser/console.js'] = function(module, exports, require){module.exports = {
   write: function(str) {
     if (typeof console === 'undefined' || !console.log) return;
     if (console.log.apply) {
@@ -87,7 +87,7 @@ require.modules['lib/browser/console.js'] = function(module, exports, require, g
   end: function() {}
 };
 };
-require.modules['lib/browser/localstorage.js'] = function(module, exports, require, global){var cache = false;
+require.modules['lib/browser/localstorage.js'] = function(module, exports, require){var cache = false;
 
 module.exports = {
   write: function(str) {
@@ -100,7 +100,7 @@ module.exports = {
   end: function() {}
 };
 };
-require.modules['minilog.js'] = function(module, exports, require, global){var callbacks = [],
+require.modules['minilog.js'] = function(module, exports, require){var callbacks = [],
     log = { readable: true },
     def = { format: function() { return ''; } };
 
