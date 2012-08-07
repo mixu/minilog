@@ -131,8 +131,7 @@ log.removeListener = log.removeAllListeners = function(ev, callback) {
   }
 };
 
-function serialize(args) {
-  var items = Array.prototype.slice.call(args);
+log.serialize = function(items) {
   if(!JSON || !JSON.stringify) return items;
   for(var i = 0; i < items.length; i++) {
     if(items[i] && typeof items[i] == 'object') {
@@ -148,11 +147,11 @@ function serialize(args) {
 }
 
 exports = module.exports = function create(name) {
-  var o   = function() { log.emit('item', name, undefined, serialize(arguments)); return o; };
-  o.debug = function() { log.emit('item', name, 'debug', serialize(arguments)); return o; };
-  o.info  = function() { log.emit('item', name, 'info',  serialize(arguments)); return o; };
-  o.warn  = function() { log.emit('item', name, 'warn',  serialize(arguments)); return o; };
-  o.error = function() { log.emit('item', name, 'error', serialize(arguments)); return o; };
+  var o   = function() { log.emit('item', name, undefined, Array.prototype.slice.call(arguments)); return o; };
+  o.debug = function() { log.emit('item', name, 'debug', Array.prototype.slice.call(arguments)); return o; };
+  o.info  = function() { log.emit('item', name, 'info',  Array.prototype.slice.call(arguments)); return o; };
+  o.warn  = function() { log.emit('item', name, 'warn',  Array.prototype.slice.call(arguments)); return o; };
+  o.error = function() { log.emit('item', name, 'error', Array.prototype.slice.call(arguments)); return o; };
   return o;
 };
 
@@ -162,10 +161,18 @@ exports.format = function(formatter) {
 
 exports.pipe = function(dest) {
   var config = {};
-  log.on('item', function(name, level, args) {
-    if(config.filter && !config.filter(name, level)) return;
-    dest.write((config.format ? config : def).format(name, level, args));
-  }).on('end', function() { !dest._isStdio && dest.end(); });
+  if(dest._isFormatted) {
+    log.on('item', function(name, level, args) {
+      if(config.filter && !config.filter(name, level)) return;
+      dest.format(name, level, args);
+    });
+  } else {
+    log.on('item', function(name, level, args) {
+      if(config.filter && !config.filter(name, level)) return;
+      dest.write((config.format ? config : def).format(name, level, log.serialize(args)));
+    });
+  }
+  log.on('end', function() { !dest._isStdio && dest.end(); });
   var chain = {
     filter: function(cb) { config.filter = cb; return chain; },
     format: function(cb) { config.format = cb; return chain; },

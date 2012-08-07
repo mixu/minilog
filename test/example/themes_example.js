@@ -1,5 +1,5 @@
 var log = require('../../minilog')('app'),
-    ConsoleBackend = require('../../backends/node_console');
+    ConsoleBackend = require('../../lib/node/console');
 
 function out() {
   log
