@@ -133,17 +133,20 @@ log.removeListener = log.removeAllListeners = function(ev, callback) {
 
 log.serialize = function(items) {
   if(!JSON || !JSON.stringify) return items;
+  var result = [];
   for(var i = 0; i < items.length; i++) {
     if(items[i] && typeof items[i] == 'object') {
       // Buffers in Node.js look bad when stringified
       if(items[i].constructor && items[i].constructor.isBuffer) {
-        items[i] = items[i].toString();
+        result[i] = items[i].toString();
       } else {
-        items[i] = JSON.stringify(items[i]);
+        result[i] = JSON.stringify(items[i]);
       }
+    } else {
+      result[i] = items[i];
     }
   }
-  return items;
+  return result;
 }
 
 exports = module.exports = function create(name) {
