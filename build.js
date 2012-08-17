@@ -55,6 +55,7 @@ build
     if(!path.existsSync('./dist')) {
       fs.mkdirSync('./dist/');
     }
+    txt += '/*global Minilog:false */';
     fs.writeFileSync('./dist/minilog.js', txt);
     console.log('Wrote ./dist/minilog.js');
   });

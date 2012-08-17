@@ -147,7 +147,7 @@ log.serialize = function(items) {
     }
   }
   return result;
-}
+};
 
 exports = module.exports = function create(name) {
   var o   = function() { log.emit('item', name, undefined, Array.prototype.slice.call(arguments)); return o; };
@@ -190,4 +190,4 @@ exports.end = function() {
 };
 };
 Minilog = require('index.js');
-})();
+})();/*global Minilog:false */
