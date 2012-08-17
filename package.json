@@ -6,7 +6,7 @@
   "dependencies": {},
   "devDependencies": {
     "mocha": "*",
-    "glue": "git://github.com/mixu/gluejs.git"
+    "gluejs": "git://github.com/mixu/gluejs.git"
   },
   "repository": {
     "type": "git",

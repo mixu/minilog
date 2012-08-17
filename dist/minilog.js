@@ -1,6 +1,6 @@
-(function(){function require(p, parent){ var path = require.resolve(p) , mod = require.modules[path]; if (!mod) throw new Error('failed to require "' + p + '" from ' + parent); if (!mod.exports) { mod.exports = {}; mod.call(mod.exports, mod, mod.exports, require.relative(path)); } return mod.exports;}require.modules = {};require.resolve = function(path){ var orig = path , reg = path + '.js' , index = path + '/index.js'; return require.modules[reg] && reg || require.modules[index] && index || orig;};require.relative = function(parent) { return function(p){ if ('.' != p.charAt(0)) return require(p); var path = parent.split('/') , segs = p.split('/'); path.pop(); for (var i = 0; i < segs.length; i++) { var seg = segs[i]; if ('..' == seg) path.pop(); else if ('.' != seg) path.push(seg); } return require(path.join('/'), parent); };};
-require.modules["jquery"] = { exports: window.$ };
-require.modules['index.js'] = function(module, exports, require){var Minilog = require('./minilog.js');
+(function(){function require(p, context, parent){ context || (context = 0); var path = require.resolve(p, context), mod = require.modules[context][path]; if (!mod) throw new Error('failed to require "' + p + '" from ' + parent); if(mod.context) { context = mod.context; path = mod.main; mod = require.modules[context][mod.main]; } if (!mod.exports) { mod.exports = {}; mod.call(mod.exports, mod, mod.exports, require.relative(path, context)); } return mod.exports;}require.modules = [{}];require.resolve = function(path, context){ var orig = path, reg = path + '.js', index = path + '/index.js'; return require.modules[context][reg] && reg || require.modules[context][index] && index || orig;};require.relative = function(relativeTo, context) { return function(p){ if ('.' != p.charAt(0)) return require(p); var path = relativeTo.split('/') , segs = p.split('/'); path.pop(); for (var i = 0; i < segs.length; i++) { var seg = segs[i]; if ('..' == seg) path.pop(); else if ('.' != seg) path.push(seg); } return require(path.join('/'), context, relativeTo); };};
+require.modules[0]["jquery"] = { exports: window.$ };
+require.modules[0]['index.js'] = function(module, exports, require){var Minilog = require('./minilog.js');
 
 // default formatter for browser
 Minilog.format(function(name, level, args) {
@@ -58,7 +58,7 @@ exports.backends = {   browser: require('./lib/browser/console.js'),
   array: require('./lib/browser/array.js'),
   localstorage: require('./lib/browser/localstorage.js') };
 };
-require.modules['lib/browser/array.js'] = function(module, exports, require){var cache = [ ];
+require.modules[0]['lib/browser/array.js'] = function(module, exports, require){var cache = [ ];
 
 module.exports = {
   write: function(str) {
@@ -70,7 +70,7 @@ module.exports = {
   empty: function() { cache = []; }
 };
 };
-require.modules['lib/browser/console.js'] = function(module, exports, require){module.exports = {
+require.modules[0]['lib/browser/console.js'] = function(module, exports, require){module.exports = {
   write: function(str) {
     if (typeof console === 'undefined' || !console.log) return;
     if (console.log.apply) {
@@ -90,7 +90,7 @@ require.modules['lib/browser/console.js'] = function(module, exports, require){m
   end: function() {}
 };
 };
-require.modules['lib/browser/localstorage.js'] = function(module, exports, require){var cache = false;
+require.modules[0]['lib/browser/localstorage.js'] = function(module, exports, require){var cache = false;
 
 module.exports = {
   write: function(str) {
@@ -103,7 +103,7 @@ module.exports = {
   end: function() {}
 };
 };
-require.modules['minilog.js'] = function(module, exports, require){var callbacks = [],
+require.modules[0]['minilog.js'] = function(module, exports, require){var callbacks = [],
     log = { readable: true },
     def = { format: function() { return ''; } };
 
@@ -190,4 +190,4 @@ exports.end = function() {
 };
 };
 Minilog = require('index.js');
-})();/*global Minilog:false */
+}());/*global Minilog:false */
