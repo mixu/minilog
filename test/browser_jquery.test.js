@@ -1,7 +1,9 @@
 var fs = require('fs'),
     assert = require('assert');
 
-var Batch = require('../lib/browser/jquery');
+var Batch = require('../lib/browser/jquery'),
+    localStorage = require('./lib/localstorage'),
+    window = { localStorage: localStorage, jquery: {} };
 
 exports['given a jquery backend'] = {
 
@@ -10,7 +12,8 @@ exports['given a jquery backend'] = {
   },
 
   beforeEach: function() {
-    this.j = new Batch();
+    window.localStorage.setItem('blackbox', '{}');
+    this.j = new Batch({ window: window, interval: 1000 });
   },
 
   'can write a message': function() {
@@ -19,7 +22,12 @@ exports['given a jquery backend'] = {
   },
 
   'messages are persisted in localStorage': function() {
+    this.j.format('voice', 'info', ['#login']);
+    this.j.format('voice', 'info', ['#logout']);
 
+    assert.equal(window.localStorage.getItem('blackbox'), JSON.stringify({
+      'unique-id': [["voice","info",["#login"]],["voice","info",["#logout"]]]
+    }));
   },
 
   'writing to a full list wraps messages around': function() {
@@ -44,28 +52,60 @@ exports['given a jquery backend'] = {
   },
 
   'reset clears the messages and localstorage': function(done) {
+    this.j.write('event-1');
+    this.j.write('event-2');
+
+    assert.equal(window.localStorage.getItem('blackbox'), JSON.stringify({
+      'unique-id': ["event-1","event-2"]
+    }));
+
+    Batch.uuid = function() { return 'another-unique-id'; };
+
+    this.j.reset();
+    this.j.write('event-3');
+
+    assert.equal(window.localStorage.getItem('blackbox'), JSON.stringify({
+      'another-unique-id': ["event-3"]
+    }));
+    Batch.uuid = function() { return 'unique-id'; };
     done();
   },
 
-  'send triggers after timeout': function() {
-
-  },
-
-  'if the list of messages empty, do not send it': function() {
-
+  'send triggers after timeout': function(done) {
+    var calls = 0, j = this.j = new Batch({ window: window, interval: 100 }),
+        oldSend = j.send;
+    j.send = function() {
+      console.log('send', this);
+      calls++;
+      oldSend.call(this);
+    };
+    setTimeout(function() {
+      assert.equal(calls, 1);
+      done();
+    }, 150);
   },
 
   'if the send fails, then the messages should be resent': function() {
 
   },
 
-  'if localstorage contains items, they are sent on the first instantiation': function() {
+  'if localstorage contains items, they are sent on the first instantiation': function(done) {
+    window.localStorage.setItem('blackbox', JSON.stringify({
+      'this-is-a-uniqe-id': ['event-1'],
+      'this-is-another-uniqe-id': ['event-2']
+    }));
+    var calls = 0, j = this.j = new Batch({ window: window, interval: 100 }),
+        oldSend = j.send;
+    j.send = function() {
+      calls++;
+      oldSend.call(this);
+    };
 
-  },
-
-  'if localstorage is empty, nothing is done': function() {
-
-  },
+    setTimeout(function() {
+      assert.equal(calls, 1);
+      done();
+    }, 150);
+  }
 
 };
 
