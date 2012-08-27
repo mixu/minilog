@@ -51,7 +51,8 @@ exports['given a jquery backend'] = {
     ]);
   },
 
-  'reset clears the messages and localstorage': function(done) {
+/*
+  'reset clears the messages, but not localstorage': function(done) {
     this.j.write('event-1');
     this.j.write('event-2');
 
@@ -61,7 +62,7 @@ exports['given a jquery backend'] = {
 
     Batch.uuid = function() { return 'another-unique-id'; };
 
-    this.j.reset();
+    this.j.empty();
     this.j.write('event-3');
 
     assert.equal(window.localStorage.getItem('blackbox'), JSON.stringify({
@@ -70,6 +71,7 @@ exports['given a jquery backend'] = {
     Batch.uuid = function() { return 'unique-id'; };
     done();
   },
+*/
 
   'send triggers after timeout': function(done) {
     var calls = 0, j = this.j = new Batch({ window: window, interval: 100 }),
