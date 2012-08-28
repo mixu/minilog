@@ -61,6 +61,10 @@ exports['given a cache'] = {
       assert.deepEqual(this.messages, ['foo', 'bar']);
     }
 
+    'calling prepareSend multiple times before sendSuccess sendError does not leak keys': function() {
+
+    }
+
   }
 
 };

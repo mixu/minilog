@@ -62,7 +62,7 @@ exports.pipe = function(dest) {
   if(dest._isFormatted) {
     log.on('item', function(name, level, args) {
       if(config.filter && !config.filter(name, level)) return;
-      dest.format(name, level, args);
+      dest.write((config.format ? config : dest).format(name, level, args));
     });
   } else {
     log.on('item', function(name, level, args) {
