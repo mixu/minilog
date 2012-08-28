@@ -14,10 +14,6 @@ exports['given a cache'] = {
     localStorage.clear();
   },
 
-  'can load from localStorage': function() {
-
-  },
-
   'can append': function() {
     Cache.append('foo');
     assert.deepEqual(Cache._get(), ['foo']);
@@ -59,7 +55,11 @@ exports['given a cache'] = {
     },
 
     'after a sendError, the next prepareSend picks up the messages': function() {
-
+      Cache.sendError();
+      Cache.append('bar');
+      this.messages = Cache.prepareSend();
+      assert.deepEqual(this.messages, ['foo', 'bar']);
+      console.log(Cache.prune());
     }
 
   }
