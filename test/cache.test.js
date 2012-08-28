@@ -59,7 +59,6 @@ exports['given a cache'] = {
       Cache.append('bar');
       this.messages = Cache.prepareSend();
       assert.deepEqual(this.messages, ['foo', 'bar']);
-      console.log(Cache.prune());
     }
 
   }
