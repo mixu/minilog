@@ -102,7 +102,7 @@ if(typeof window != 'undefined') {
 
 exports = module.exports = Minilog;
 
-undefined
+
 exports.backends = {  browser: require('./browser/console.js'),
   array: require('./browser/array.js'),
   localstorage: require('./browser/localstorage.js')};}

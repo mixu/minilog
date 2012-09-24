@@ -21,7 +21,7 @@ function getExports() {
   return fs
           .readFileSync('./lib/index.js')
           .toString()
-          .replace(/exports.backends = \{[\s\S]*\};/m)+
+          .replace(/exports.backends = \{[\s\S]*\};/m, '')+
           'exports.backends = {' +
           [
             (hasBrowser ? "  browser: require('./browser/console.js')" : undefined ),
