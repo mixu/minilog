@@ -19,20 +19,24 @@ var hasBrowser = process.argv.some(function(o) { return o == 'browser'}),
 
 function getExports() {
   return fs
-          .readFileSync('./lib/browser/index.js')
+          .readFileSync('./lib/index.js')
           .toString()
-          .replace('%backends_block%', [
-            (hasBrowser ? "  browser: require('./lib/browser/console.js')" : undefined ),
-            (hasArray ? "  array: require('./lib/browser/array.js')" : undefined ),
-            (hasLocalStorage ? "  localstorage: require('./lib/browser/localstorage.js')" : undefined ),
-            (hasjQuery ? "  jquery: require('./lib/browser/jquery.js')" : undefined ),
-          ].filter(function(v) { return !!v; }).join(',\n'));
+          .replace(/exports.backends = \{[\s\S]*\};/m)+
+          'exports.backends = {' +
+          [
+            (hasBrowser ? "  browser: require('./browser/console.js')" : undefined ),
+            (hasArray ? "  array: require('./browser/array.js')" : undefined ),
+            (hasLocalStorage ? "  localstorage: require('./browser/localstorage.js')" : undefined ),
+            (hasjQuery ? "  jquery: require('./browser/jquery.js')" : undefined ),
+          ].filter(function(v) { return !!v; }).join(',\n')
+          + '};';
 }
 
 var build = new Glue()
   .basepath('./')
-  .define('index.js', getExports())
-  .include('./minilog.js');
+  .main('lib/index.js')
+  .define('lib/index.js', getExports())
+  .include('./lib/minilog.js');
 
 if(hasArray) {
   build.include('./lib/browser/array.js');

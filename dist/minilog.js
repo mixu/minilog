@@ -1,13 +1,60 @@
-(function(){function require(p, context, parent){ context || (context = 0); var path = require.resolve(p, context), mod = require.modules[context][path]; if (!mod) throw new Error('failed to require "' + p + '" from ' + parent); if(mod.context) { context = mod.context; path = mod.main; mod = require.modules[context][mod.main]; } if (!mod.exports) { mod.exports = {}; mod.call(mod.exports, mod, mod.exports, require.relative(path, context)); } return mod.exports;}require.modules = [{}];require.resolve = function(path, context){ var orig = path, reg = path + '.js', index = path + '/index.js'; return require.modules[context][reg] && reg || require.modules[context][index] && index || orig;};require.relative = function(relativeTo, context) { return function(p){ if ('.' != p.charAt(0)) return require(p); var path = relativeTo.split('/') , segs = p.split('/'); path.pop(); for (var i = 0; i < segs.length; i++) { var seg = segs[i]; if ('..' == seg) path.pop(); else if ('.' != seg) path.push(seg); } return require(path.join('/'), context, relativeTo); };};
-require.modules[0]["jquery"] = { exports: window.$ };
-require.modules[0]['index.js'] = function(module, exports, require){var Minilog = require('./minilog.js');
+(function(){function require(p, context, parent){ context || (context = 0); var path = require.resolve(p, context), mod = require.modules[context][path]; if (!mod) throw new Error('failed to require "' + p + '" from ' + parent); if(mod.context) { context = mod.context; path = mod.main; mod = require.modules[context][mod.main]; if (!mod) throw new Error('failed to require "' + path + '" from ' + context); } if (!mod.exports) { mod.exports = {}; mod.call(mod.exports, mod, mod.exports, require.relative(path, context)); } return mod.exports;}require.modules = [{}];require.resolve = function(path, context){ var orig = path, reg = path + '.js', index = path + '/index.js'; return require.modules[context][reg] && reg || require.modules[context][index] && index || orig;};require.relative = function(relativeTo, context) { return function(p){ if ('.' != p.charAt(0)) return require(p, context, relativeTo); var path = relativeTo.split('/') , segs = p.split('/'); path.pop(); for (var i = 0; i < segs.length; i++) { var seg = segs[i]; if ('..' == seg) path.pop(); else if ('.' != seg) path.push(seg); } return require(path.join('/'), context, relativeTo); };};
+require.modules[0] = { "jquery": { exports: window.$ }
+,"lib/browser/array.js": function(module, exports, require){var cache = [ ];
 
-// default formatter for browser
+module.exports = {
+  write: function(str) {
+    cache.push(str);
+  },
+  end: function() {},
+  // utility functions
+  get: function() { return cache; },
+  empty: function() { cache = []; }
+};
+},"lib/browser/console.js": function(module, exports, require){var newlines = /\n+$/;
+
+module.exports = {
+  write: function(str) {
+    var args = Array.prototype.slice.call(arguments),
+        len = args.length,
+        last = args[args.length-1];
+    if (typeof console === 'undefined' || !console.log) return;
+    if(last && typeof last === 'string') {
+      args[args.length -1] = last.replace(newlines, '');
+    }
+    if (console.log.apply) {
+      // console.log.apply is undefined in IE8 and IE9
+      // and still useless for objects in IE9. But useful for non-IE browsers.
+      return console.log.apply(console, args);
+    }
+    if(!JSON || !JSON.stringify) return;
+    // for IE8/9: make console.log at least a bit less awful
+    for(var i = 0; i < len; i++) {
+      args[i] = JSON.stringify(args[i]);
+    }
+    console.log(args.join(' '));
+  },
+  end: function() {}
+};
+},"lib/browser/localstorage.js": function(module, exports, require){var cache = false;
+
+module.exports = {
+  write: function(str) {
+    if(typeof window == 'undefined' || !window.localStorage ||
+       typeof JSON == 'undefined' || !JSON.stringify || !JSON.parse) return;
+    if(!cache) { cache = (window.localStorage.minilog ? JSON.parse(window.localStorage.minilog) : []); }
+    cache.push(new Date().toString() + ' '+ str);
+    window.localStorage.minilog = JSON.stringify(cache);
+  },
+  end: function() {}
+};
+},"lib/index.js": function(module, exports, require){var Minilog = require('./minilog.js');
+
 Minilog.format(function(name, level, args) {
   var prefix = [];
   if(name) prefix.push(name);
   if(level) prefix.push(level);
- return prefix.concat(args).join(' ');
+  return prefix.concat(args).join(' ') + '\n';
 });
 
 // support for enabling() console logging easily
@@ -25,7 +72,7 @@ function filter(name, level) {
 }
 
 Minilog.enable = function(str) {
-  if(!enabled) { Minilog.pipe(require('./lib/browser/console.js')).filter(filter); }
+  if(!enabled) { Minilog.pipe(require('./browser/console.js')).filter(filter); }
   enabled = true;
   whitelist = [];
   if(!str) { str = '*.debug'; }
@@ -54,56 +101,12 @@ if(typeof window != 'undefined') {
 }
 
 exports = module.exports = Minilog;
-exports.backends = {   browser: require('./lib/browser/console.js'),
-  array: require('./lib/browser/array.js'),
-  localstorage: require('./lib/browser/localstorage.js') };
-};
-require.modules[0]['lib/browser/array.js'] = function(module, exports, require){var cache = [ ];
 
-module.exports = {
-  write: function(str) {
-    cache.push(str);
-  },
-  end: function() {},
-  // utility functions
-  get: function() { return cache; },
-  empty: function() { cache = []; }
-};
-};
-require.modules[0]['lib/browser/console.js'] = function(module, exports, require){module.exports = {
-  write: function(str) {
-    if (typeof console === 'undefined' || !console.log) return;
-    if (console.log.apply) {
-      // console.log.apply is undefined in IE8 and IE9
-      // and still useless for objects in IE9. But useful for non-IE browsers.
-      return console.log.apply(console, arguments);
-    }
-    if(!JSON || !JSON.stringify) return;
-    // for IE8/9: make console.log at least a bit less awful
-    var args = Array.prototype.slice.call(arguments),
-        len = args.length;
-    for(var i = 0; i < len; i++) {
-      args[i] = JSON.stringify(args[i]);
-    }
-    console.log(args.join(' '));
-  },
-  end: function() {}
-};
-};
-require.modules[0]['lib/browser/localstorage.js'] = function(module, exports, require){var cache = false;
-
-module.exports = {
-  write: function(str) {
-    if(typeof window == 'undefined' || !window.localStorage ||
-       typeof JSON == 'undefined' || !JSON.stringify || !JSON.parse) return;
-    if(!cache) { cache = (window.localStorage.minilog ? JSON.parse(window.localStorage.minilog) : []); }
-    cache.push(new Date().toString() + ' '+ str);
-    window.localStorage.minilog = JSON.stringify(cache);
-  },
-  end: function() {}
-};
-};
-require.modules[0]['minilog.js'] = function(module, exports, require){var callbacks = [],
+undefined
+exports.backends = {  browser: require('./browser/console.js'),
+  array: require('./browser/array.js'),
+  localstorage: require('./browser/localstorage.js')};}
+,"lib/minilog.js": function(module, exports, require){var callbacks = [],
     log = { readable: true },
     def = { format: function() { return ''; } };
 
@@ -167,7 +170,7 @@ exports.pipe = function(dest) {
   if(dest._isFormatted) {
     log.on('item', function(name, level, args) {
       if(config.filter && !config.filter(name, level)) return;
-      dest.format(name, level, args);
+      dest.write((config.format ? config : dest).format(name, level, args));
     });
   } else {
     log.on('item', function(name, level, args) {
@@ -188,6 +191,6 @@ exports.end = function() {
   log.emit('end');
   callbacks = [];
 };
-};
-Minilog = require('index.js');
+}};
+Minilog = require('lib/index.js');
 }());/*global Minilog:false */
