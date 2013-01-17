@@ -56,7 +56,7 @@ build
   .export('Minilog')
   .render(function (err, txt) {
     if(err) throw err;
-    if(!path.existsSync('./dist')) {
+    if(!fs.existsSync('./dist')) {
       fs.mkdirSync('./dist/');
     }
     txt += '/*global Minilog:false */';

@@ -1,6 +1,7 @@
-(function(){function require(p, context, parent){ context || (context = 0); var path = require.resolve(p, context), mod = require.modules[context][path]; if (!mod) throw new Error('failed to require "' + p + '" from ' + parent); if(mod.context) { context = mod.context; path = mod.main; mod = require.modules[context][mod.main]; if (!mod) throw new Error('failed to require "' + path + '" from ' + context); } if (!mod.exports) { mod.exports = {}; mod.call(mod.exports, mod, mod.exports, require.relative(path, context)); } return mod.exports;}require.modules = [{}];require.resolve = function(path, context){ var orig = path, reg = path + '.js', index = path + '/index.js'; return require.modules[context][reg] && reg || require.modules[context][index] && index || orig;};require.relative = function(relativeTo, context) { return function(p){ if ('.' != p.charAt(0)) return require(p, context, relativeTo); var path = relativeTo.split('/') , segs = p.split('/'); path.pop(); for (var i = 0; i < segs.length; i++) { var seg = segs[i]; if ('..' == seg) path.pop(); else if ('.' != seg) path.push(seg); } return require(path.join('/'), context, relativeTo); };};
-require.modules[0] = { "jquery": { exports: window.$ }
-,"lib/browser/array.js": function(module, exports, require){var cache = [ ];
+(function(){function require(e,t){for(var n=[],r=e.split("/"),i,s,o=0;s=r[o++];)".."==s?n.pop():"."!=s&&n.push(s);n=n.join("/"),o=require,s=o.m[t||0],i=s[n+".js"]||s[n+"/index.js"]||s[n];if(s=i.c)i=o.m[t=s][e=i.m];return i.exports||i(i,i.exports={},function(n){return o("."!=n.charAt(0)?n:e+"/../"+n,t)}),i.exports};
+require.m = [];
+require.m[0] = { "jquery": { exports: window.$ },
+"lib/browser/array.js": function(module, exports, require){var cache = [ ];
 
 module.exports = {
   write: function(str) {
@@ -11,7 +12,8 @@ module.exports = {
   get: function() { return cache; },
   empty: function() { cache = []; }
 };
-},"lib/browser/console.js": function(module, exports, require){var newlines = /\n+$/;
+},
+"lib/browser/console.js": function(module, exports, require){var newlines = /\n+$/;
 
 module.exports = {
   write: function(str) {
@@ -36,19 +38,22 @@ module.exports = {
   },
   end: function() {}
 };
-},"lib/browser/localstorage.js": function(module, exports, require){var cache = false;
+},
+"lib/browser/localstorage.js": function(module, exports, require){var cache = false;
 
 module.exports = {
   write: function(str) {
-    if(typeof window == 'undefined' || !window.localStorage ||
-       typeof JSON == 'undefined' || !JSON.stringify || !JSON.parse) return;
-    if(!cache) { cache = (window.localStorage.minilog ? JSON.parse(window.localStorage.minilog) : []); }
-    cache.push(new Date().toString() + ' '+ str);
-    window.localStorage.minilog = JSON.stringify(cache);
+    if(typeof window == 'undefined' || typeof JSON == 'undefined' || !JSON.stringify || !JSON.parse) return;
+    try {
+      if(!cache) { cache = (window.localStorage.minilog ? JSON.parse(window.localStorage.minilog) : []); }
+      cache.push(new Date().toString() + ' '+ str);
+      window.localStorage.minilog = JSON.stringify(cache);
+    } catch(e) {}
   },
   end: function() {}
 };
-},"lib/index.js": function(module, exports, require){var Minilog = require('./minilog.js');
+},
+"lib/index.js": function(module, exports, require){var Minilog = require('./minilog.js');
 
 Minilog.format(function(name, level, args) {
   var prefix = [];
@@ -82,18 +87,16 @@ Minilog.enable = function(str) {
     if(expr.length > 2) { expr = [ expr.slice(0, -1).join('.'), expr.slice(-1).join() ]; }
     whitelist.push({ topic: new RegExp('^'+expr[0].replace('*', '.*')), level: levelMap[expr[1]] || 1 });
   }
-  if(typeof window != 'undefined' && window.localStorage) {
+  try {
     window.localStorage.minilogSettings = JSON.stringify(str);
-  }
+  } catch(e) {}
 };
 
 // apply enable inputs from localStorage and from the URL
 if(typeof window != 'undefined') {
-  if(window.localStorage && window.localStorage.minilogSettings) {
-    try {
-      Minilog.enable(JSON.parse(window.localStorage.minilogSettings));
-    } catch(e) { }
-  }
+  try {
+    Minilog.enable(JSON.parse(window.localStorage.minilogSettings));
+  } catch(e) {}
   if(window.location && window.location.search) {
     var match = RegExp('[?&]minilog=([^&]*)').exec(window.location.search);
     match && Minilog.enable(decodeURIComponent(match[1]));
@@ -106,7 +109,8 @@ exports = module.exports = Minilog;
 exports.backends = {  browser: require('./browser/console.js'),
   array: require('./browser/array.js'),
   localstorage: require('./browser/localstorage.js')};}
-,"lib/minilog.js": function(module, exports, require){var callbacks = [],
+,
+"lib/minilog.js": function(module, exports, require){var callbacks = [],
     log = { readable: true },
     def = { format: function() { return ''; } };
 
