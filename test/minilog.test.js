@@ -18,45 +18,39 @@ WriteStream.prototype.end = function() {};
 
 exports['given a minilog'] = {
 
-  beforeEach: function(done) {
+  beforeEach: function() {
     this.stream = new WriteStream();
     this.pipe = MiniLog.pipe(this.stream);
     this.log = MiniLog();
-    done();
   },
 
-  afterEach: function(done) {
+  afterEach: function() {
     MiniLog.end();
-    done();
   },
 
-  'can log to process.stdout': function(done) {
+  'can log to process.stdout': function() {
     MiniLog.pipe(process.stdout);
     this.log('foo');
-    done();
   },
 
-  'can log to stream': function(done) {
+  'can log to stream': function() {
     this.log('foo');
     assert.equal(this.stream.content[0], 'foo\n');
-    done();
   },
 
-  'can pass multiple arguments': function(done) {
+  'can pass multiple arguments': function() {
     this.log('foo', 1, true, 'bar');
     assert.equal(this.stream.content[0], 'foo 1 true bar\n');
-    done();
   },
 
-  'can pass object as argument and get JSON': function(done) {
+  'can pass object as argument and get JSON': function() {
     this.log('foo', { bar: 'baz' });
     assert.equal(this.stream.content[0], 'foo {"bar":"baz"}\n');
     this.log([1, 2, { bar: 'baz'}]);
     assert.equal(this.stream.content[1], '[1,2,{"bar":"baz"}]\n');
-    done();
   },
 
-  'can use log.error, log.warn, log.info, log.debug': function(done) {
+  'can use log.error, log.warn, log.info, log.debug': function() {
     this.log.error('aaa');
     assert.equal(this.stream.content[0], 'error aaa\n');
     this.log.warn('aaa');
@@ -65,10 +59,9 @@ exports['given a minilog'] = {
     assert.equal(this.stream.content[2], 'info aaa\n');
     this.log.debug('aaa');
     assert.equal(this.stream.content[3], 'debug aaa\n');
-    done();
   },
 
-  'can create a namespaced logger': function(done) {
+  'can create a namespaced logger': function() {
     this.log = MiniLog('ns');
     this.log('foo');
     assert.equal(this.stream.content[0], 'ns foo\n');
@@ -80,10 +73,9 @@ exports['given a minilog'] = {
     assert.equal(this.stream.content[3], 'ns info aaa\n');
     this.log.debug('aaa');
     assert.equal(this.stream.content[4], 'ns debug aaa\n');
-    done();
   },
 
-  'can filter by namespace and type': function(done) {
+  'can filter by namespace and type': function() {
     var ns = MiniLog('ns'),
         ns2 = MiniLog('ns2');
 
@@ -98,17 +90,16 @@ exports['given a minilog'] = {
     ns2.error('fgh');
     assert.equal(this.stream.content[0], 'ns2 info cde\n');
     assert.equal(this.stream.content[1], 'ns2 error fgh\n');
-    done();
   },
 
   'can pipe into file': function(done) {
-    var ws = fs.createWriteStream('./temp.log');
+    var ws = fs.createWriteStream(__dirname + '/temp.log');
     MiniLog.pipe(ws);
     this.log('hello world');
     this.log('foobar');
     MiniLog.end();
     setTimeout(function() {
-      assert.equal(fs.readFileSync('./temp.log').toString(), 'hello world\nfoobar\n');
+      assert.equal(fs.readFileSync(__dirname + '/temp.log').toString(), 'hello world\nfoobar\n');
       done();
     }, 10);
   },
@@ -129,10 +120,9 @@ exports['given a minilog'] = {
     done();
   },
 
-  'logging a buffer doesn\'t look horrible': function(done) {
+  'logging a buffer doesn\'t look horrible': function() {
     this.log(new Buffer('Hello world'));
     assert.equal(this.stream.content[0], 'Hello world\n');
-    done();
   }
 
 };

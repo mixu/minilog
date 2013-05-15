@@ -3,7 +3,9 @@
   "description": "Lightweight client & server-side logging with Stream-API backends and counting, timing support",
   "version": "0.1.0",
   "main": "lib/index.js",
-  "dependencies": {},
+  "dependencies": {
+    "microee": "0.0.2"
+  },
   "devDependencies": {
     "mocha": "*",
     "gluejs": "git://github.com/mixu/gluejs.git"

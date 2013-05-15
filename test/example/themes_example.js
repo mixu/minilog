@@ -1,5 +1,5 @@
-var log = require('../../minilog')('app'),
-    ConsoleBackend = require('../../lib/node/console');
+var log = require('minilog')('app'),
+    ConsoleBackend = require('minilog').backends.console;
 
 function out() {
   log
@@ -9,23 +9,10 @@ function out() {
     .error('this is an error message');
 };
 
-console.log('\n== Theme: clean\n');
-var config = require('../../minilog').pipe(ConsoleBackend).format(ConsoleBackend.formatClean);
-out();
+var config = require('minilog').pipe(ConsoleBackend);
 
-console.log('\n== Theme: color\n');
-config.format(ConsoleBackend.formatColor);
-out();
-
-console.log('\n== Theme: npm\n');
-config.format(ConsoleBackend.formatNpm);
-out();
-
-console.log('\n== Theme: learnboost\n');
-config.format(ConsoleBackend.formatLearnboost);
-out();
-
-console.log('\n== Theme: withStack\n');
-config.format(ConsoleBackend.formatWithStack);
-out();
-
+ConsoleBackend.formatters.forEach(function(name) {
+  console.log('\n== Theme: '+name+'\n');
+  config.format(ConsoleBackend[name]);
+  out();
+});
