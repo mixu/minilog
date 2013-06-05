@@ -2,6 +2,17 @@ TESTS += test/cache.test.js
 TESTS += test/filter.test.js
 TESTS += test/minilog.test.js
 
+build:
+	@mkdir -p ./dist/
+	@echo 'Building dist/minilog.js'
+	@./node_modules/gluejs/bin/gluejs \
+	--include ./lib/common \
+	--include ./lib/web \
+	--command 'uglifyjs --no-copyright' \
+	--global Minilog \
+	--main lib/web/index.js \
+	--out dist/minilog.js
+
 test:
 	@mocha \
 		--ui exports \
@@ -13,5 +24,5 @@ test:
 formatters:
 	@node test/example/themes_example.js
 
-.PHONY: test formatters
+.PHONY: build test formatters
 

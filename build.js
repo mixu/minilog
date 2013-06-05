@@ -36,7 +36,7 @@ var build = new Glue()
   .basepath('./')
   .main('lib/index.js')
   .define('lib/index.js', getExports())
-  .include('./lib/minilog.js');
+  .include('./lib/index.js');
 
 if(hasArray) {
   build.include('./lib/browser/array.js');
