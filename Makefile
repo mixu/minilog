@@ -5,10 +5,22 @@ TESTS += test/minilog.test.js
 build:
 	@mkdir -p ./dist/
 	@echo 'Building dist/minilog.js'
-	@./node_modules/gluejs/bin/gluejs \
+	./node_modules/gluejs/bin/gluejs \
 	--include ./lib/common \
 	--include ./lib/web \
-	--command 'uglifyjs --no-copyright' \
+	--include ./node_modules/microee/ \
+	--command 'uglifyjs --no-copyright --mangle-toplevel' \
+	--global Minilog \
+	--main lib/web/index.js \
+	--out dist/minilog.js
+
+build-debug:
+	@mkdir -p ./dist/
+	@echo 'Building dist/minilog.js'
+	./node_modules/gluejs/bin/gluejs \
+	--include ./lib/common \
+	--include ./lib/web \
+	--include ./node_modules/microee/ \
 	--global Minilog \
 	--main lib/web/index.js \
 	--out dist/minilog.js
@@ -24,5 +36,5 @@ test:
 formatters:
 	@node test/example/themes_example.js
 
-.PHONY: build test formatters
+.PHONY: build build-debug test formatters
 
