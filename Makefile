@@ -2,28 +2,30 @@ TESTS += test/cache.test.js
 TESTS += test/filter.test.js
 TESTS += test/minilog.test.js
 
+DEFAULTS := \
+	--include ./lib/common \
+	--include ./node_modules/microee/ \
+	--global Minilog \
+	--main lib/web/index.js \
+	--out dist/minilog.js
+
 build:
 	@mkdir -p ./dist/
 	@echo 'Building dist/minilog.js'
 	./node_modules/gluejs/bin/gluejs \
-	--include ./lib/common \
 	--include ./lib/web \
-	--include ./node_modules/microee/ \
-	--command 'uglifyjs --no-copyright --mangle-toplevel' \
-	--global Minilog \
-	--main lib/web/index.js \
-	--out dist/minilog.js
+	$(DEFAULTS) \
+	--command 'uglifyjs --no-copyright --mangle-toplevel'
 
 build-debug:
 	@mkdir -p ./dist/
 	@echo 'Building dist/minilog.js'
 	./node_modules/gluejs/bin/gluejs \
-	--include ./lib/common \
-	--include ./lib/web \
-	--include ./node_modules/microee/ \
-	--global Minilog \
-	--main lib/web/index.js \
-	--out dist/minilog.js
+	$(DEFAULTS) \
+	--include ./lib/web
+
+gzip:
+	cat dist/minilog.js | gzip | wc -c
 
 test:
 	@mocha \
