@@ -9,10 +9,21 @@ function out() {
     .error('this is an error message');
 };
 
-var config = require('minilog').pipe(ConsoleBackend);
+var minilog = require('minilog');
+
+console.log('\n== Default style\n');
+
+minilog.enable();
+out();
+minilog.disable();
+
 
 ConsoleBackend.formatters.forEach(function(name) {
   console.log('\n== Theme: '+name+'\n');
-  config.format(ConsoleBackend[name]);
+
+  minilog.pipe(ConsoleBackend[name])
+         .pipe(ConsoleBackend);
+
   out();
+  minilog.unpipe();
 });
