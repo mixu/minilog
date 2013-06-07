@@ -1,28 +1,24 @@
-var assert = require('assert');
+var assert = require('assert'),
+    Filter = require('../lib/common/filter.js');
 
-// support for enabling() console logging easily
-var enabled = false, whitelist = [];
-
-var levelMap = { debug: 1, info: 2, warn: 3, error: 4 };
+var f = new Filter();
 
 function filter(name, level) {
-  var i, expr;
-  for(i = 0; i < whitelist.length; i++) {
-    expr = whitelist[i];
-    if (expr.topic && expr.topic.test(name) && levelMap[level] >= expr.level) {
-      return true;
-    }
-  }
-  return false;
+  return f.test(name, level);
 }
 
 function enable(str) {
-  whitelist = [];
+  f.clear();
+  // whitelisted only mode
+  f.undecidedIsTrue = false;
+
   var parts = (str || '*.debug').split(/[\s,]+/), i, expr;
   for(i = 0; i < parts.length; i++) {
     expr = parts[i].split('.');
-    if(expr.length > 2) { expr = [ expr.slice(0, -1).join('.'), expr.slice(-1).join() ]; }
-    whitelist.push({ topic: new RegExp('^'+expr[0].replace('*', '.*')), level: levelMap[expr[1]] || 1 });
+    if(expr.length > 2) {
+      expr = [ expr.slice(0, -1).join('.'), expr.slice(-1).join() ];
+    }
+    f.allow(new RegExp('^'+expr[0].replace('*', '.*')), expr[1] || 'debug');
   }
 }
 
