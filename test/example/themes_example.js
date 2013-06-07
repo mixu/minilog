@@ -17,7 +17,6 @@ minilog.enable();
 out();
 minilog.disable();
 
-
 ConsoleBackend.formatters.forEach(function(name) {
   console.log('\n== Theme: '+name+'\n');
 

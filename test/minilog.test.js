@@ -1,6 +1,8 @@
 var fs = require('fs'),
     assert = require('assert'),
-    MiniLog = require('../lib/index.js');
+    MiniLog = require('../lib/index.js'),
+    Stringifier = require('../lib/common/stringify.js'),
+    Transform = require('../lib/common/transform.js');
 
 function WriteStream() {
   var self = this;
@@ -8,7 +10,7 @@ function WriteStream() {
   this.content = [];
 }
 
-require('util').inherits(WriteStream, require('events').EventEmitter);
+Transform.mixin(WriteStream);
 
 WriteStream.prototype.write = function(string, encoding) {
   this.content.push(string);
@@ -20,7 +22,7 @@ exports['given a minilog'] = {
 
   beforeEach: function() {
     this.stream = new WriteStream();
-    this.pipe = MiniLog.pipe(this.stream);
+    this.pipe = MiniLog.pipe(new Stringifier()).pipe(this.stream);
     this.log = MiniLog();
   },
 
@@ -79,9 +81,16 @@ exports['given a minilog'] = {
     var ns = MiniLog('ns'),
         ns2 = MiniLog('ns2');
 
-    this.pipe.filter(function(name, level) {
-      return name == 'ns2' && (level == 'info' || level == 'error');
-    });
+    var filter = new Transform();
+
+    filter.write = function(name, level, args) {
+      if(name == 'ns2' && (level == 'info' || level == 'error')) {
+        filter.emit('item', name, level, args);
+      }
+    };
+
+    MiniLog.unpipe();
+    this.pipe = MiniLog.pipe(filter).pipe(new Stringifier()).pipe(this.stream);
 
     ns('foo');
     ns2('abc');
@@ -105,11 +114,17 @@ exports['given a minilog'] = {
   },
 
   'can format logs': function(done) {
-    this.pipe.format(function(name, level, args) {
-      return (name ? name.toUpperCase() + ' - ' : '')
+    MiniLog.unpipe();
+
+    var format = new Transform();
+
+    format.write = function(name, level, args) {
+      this.emit('item', (name ? name.toUpperCase() + ' - ' : '')
            + (level ? level.toUpperCase() + ' - ' : '')
-           + args.join(' ') + '\n';
-    });
+           + args.join(' ') +'\n');
+    };
+
+    this.pipe = MiniLog.pipe(format).pipe(this.stream);
 
     this.log.error('aaa');
     this.log.warn('aaa');
