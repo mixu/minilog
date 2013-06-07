@@ -1,7 +1,7 @@
 var fs = require('fs'),
     assert = require('assert'),
     MiniLog = require('../lib/index.js'),
-    Stringifier = require('../lib/common/stringify.js'),
+    Stringifier = require('../lib/node/stringify.js'),
     Transform = require('../lib/common/transform.js');
 
 function WriteStream() {
