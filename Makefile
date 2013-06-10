@@ -1,4 +1,3 @@
-TESTS += test/cache.test.js
 TESTS += test/filter.test.js
 TESTS += test/minilog.test.js
 
