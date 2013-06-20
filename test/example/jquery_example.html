@@ -3,30 +3,25 @@
 <script src="minilog.js"></script>
 <script>
 ;(function() {
-  var jq = new Minilog.backends.jquery({ url: 'http://localhost:8080/log', interval: 1000, format: 'json' });
   Minilog
-    .pipe(jq)
-    .pipe({
-      write: function(str) { console.log(str); },
-      end: function() {}
-    })
-    .pipe({
-      write: function(str) {
-        var el = document.getElementById('logs');
-        $(logs).append('<li>'+str+'</li>');
-      },
-      end: function() {}
-    });
+    .enable()
+    // allow when the name matches foo or bar, and level >= debug
+    // remove the line to pipe all log lines
+    .pipe(new Minilog.Filter().allow(/^(foo|bar).*/, 'debug'))
+    .pipe(new Minilog.backends.jQuery({
+      url: 'http://localhost:8888/log',
+      interval: 5000
+      }));
   window.log = Minilog('app');
 }());
 
-function clickHandler(){
-  var el = document.getElementById('log');
-  log.info(el.value);
+function getMessage() {
+  var el = document.getElementById('log'),
+      value = el.value;
   // increment counter
   el.value = el.value.replace(/#([0-9]+)/, function(str, p1){ return '#' + (parseInt(p1, 10) + 1); });
+  return value;
 }
-
 </script>
 <body>
 
@@ -34,13 +29,12 @@ function clickHandler(){
 
 <input type="text" value="Log message #1" id="log" length="70">
 
-<input type="button" value="Add log message" onclick="clickHandler();">
+<input type="button" value="log.debug()" onclick="log.debug(getMessage());">
+<input type="button" value="log.info()" onclick="log.info(getMessage());">
+<input type="button" value="log.warn()" onclick="log.warn(getMessage());">
+<input type="button" value="log.error()" onclick="log.error(getMessage());">
 
-<p>Notice how the messages are piped to jQuery (at 1 second aggregation interval) and to the list below:</p>
-
-<ul id="logs">
-
-</ul>
+<p>Notice how the messages are piped to jQuery and to the browser console. If you have Chrome, you'll even get themed output.</p>
 
 </body>
 </html>
