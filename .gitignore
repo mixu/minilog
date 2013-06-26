@@ -1,5 +1,5 @@
 test/temp.log
 temp.log
-node_modules/
+/node_modules/
 test/example/hive
 test/example/log.txt
