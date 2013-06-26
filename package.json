@@ -8,7 +8,7 @@
   },
   "devDependencies": {
     "mocha": "*",
-    "gluejs": "git://github.com/mixu/gluejs.git"
+    "gluejs": "2.x"
   },
   "repository": {
     "type": "git",
