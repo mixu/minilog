@@ -10,7 +10,7 @@ function filter(name, level) {
 function enable(str) {
   f.clear();
   // whitelisted only mode
-  f.undecidedIsTrue = false;
+  f.defaultResult = false;
 
   var parts = (str || '*.debug').split(/[\s,]+/), i, expr;
   for(i = 0; i < parts.length; i++) {
