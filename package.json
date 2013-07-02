@@ -1,7 +1,7 @@
 {
   "name": "minilog",
   "description": "Lightweight client & server-side logging with Stream-API backends and counting, timing support",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "main": "lib/index.js",
   "dependencies": {
     "microee": "0.0.2"
