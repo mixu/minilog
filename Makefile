@@ -8,6 +8,8 @@ DEFAULTS := \
 	--main lib/web/index.js \
 	--out dist/minilog.js
 
+# Note: you need uglifyjs, e.g: `npm install -g uglify-js@1.x` first
+
 build:
 	@mkdir -p ./dist/
 	@echo 'Building dist/minilog.js'
