@@ -5,7 +5,7 @@
   ],
   "ignore": [
     "**/.*",
-    "Makefile"
+    "Makefile",
     "test",
     "package.json",
     "lib"
