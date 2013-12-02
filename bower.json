@@ -1,0 +1,13 @@
+{
+  "name": "minilog",
+  "main": [
+    "dist/minilog.js"
+  ],
+  "ignore": [
+    "**/.*",
+    "Makefile",
+    "test",
+    "package.json",
+    "lib"
+  ]
+}
