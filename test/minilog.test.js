@@ -62,7 +62,7 @@ exports['given a minilog'] = {
     this.log.debug('aaa');
     assert.equal(this.stream.content[3], 'debug aaa\n');
     this.log.log('aaa');
-    assert.equal(this.stream.content[3], 'debug aaa\n');
+    assert.equal(this.stream.content[4], 'debug aaa\n');
   },
 
   'can create a namespaced logger': function() {
