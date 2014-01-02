@@ -52,7 +52,7 @@ exports['given a minilog'] = {
     assert.equal(this.stream.content[1], '[1,2,{"bar":"baz"}]\n');
   },
 
-  'can use log.error, log.warn, log.info, log.debug': function() {
+  'can use log.error, log.warn, log.info, log.debug, log.log': function() {
     this.log.error('aaa');
     assert.equal(this.stream.content[0], 'error aaa\n');
     this.log.warn('aaa');
@@ -60,6 +60,8 @@ exports['given a minilog'] = {
     this.log.info('aaa');
     assert.equal(this.stream.content[2], 'info aaa\n');
     this.log.debug('aaa');
+    assert.equal(this.stream.content[3], 'debug aaa\n');
+    this.log.log('aaa');
     assert.equal(this.stream.content[3], 'debug aaa\n');
   },
 
