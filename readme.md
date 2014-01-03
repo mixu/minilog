@@ -20,6 +20,7 @@ I recently released Minilog v2. Heres' what's changed:
 - There is an explicit `.disable()` function in addition to `.enable()`
 - In Chrome, we support theming the dev console output.
 - The internals are more consistent with idiomatic usage of [Streams2](http://blog.nodejs.org/2012/12/20/streams2/) (with 0.8.x backward compatibility provided by readable-stream): filters and formatters are transform streams rather than functions.
+- Interface compatibility with Node and browser consoles, since `Minilog.log()` proxies to `Minilog.debug()`
 
 ## Pipes everywhere
 
@@ -118,6 +119,29 @@ To enable a specific theme, pipe to the formatter and then to the console:
 Have a look at [./test/examples/themes_example.js](https://github.com/mixu/minilog/blob/master/test/example/themes_example.js).
 
 To write your own formatter, have a look at the source code for the formatters - they inherit from `Minilog.Transform`.
+
+## Using Minilog as a console replacement
+
+If you use an injected `console` object to log browser or Node.js activity, you can use Minilog instead: they have similar interfaces. Monolog provides a `log()` method, which proxies to `debug()`.
+
+So for instance, the following snippet:
+
+```js
+function doThings(console) {
+    if (problem) {
+        console.error('problem');
+        return;
+    }
+    console.log('no problem');
+}
+```
+
+Works seamlessly with Minilog instead of `console`:
+
+```js
+var Minilog = require('minilog');
+doThings(Minilog);
+```
 
 ## Backends
 
