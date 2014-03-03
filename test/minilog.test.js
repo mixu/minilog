@@ -140,6 +140,31 @@ exports['given a minilog'] = {
   'logging a buffer doesn\'t look horrible': function() {
     this.log(new Buffer('Hello world'));
     assert.equal(this.stream.content[0], 'Hello world\n');
+  },
+
+  'logging an object with a circular structure does not blow': function() {
+    var circularObject = {
+      foo: 'bar'
+    };
+    circularObject.circleBack = circularObject;
+
+    this.log(circularObject);
+    assert.equal(this.stream.content[0], '[object Object]\n');
+  },
+
+  'logging an object with a circular structure uses the toString() method of the object': function() {
+    var circularObject = {
+      foo: 'bar'
+    };
+
+    circularObject.circleBack = circularObject;
+
+    circularObject.toString = function () {
+      return "circular object";
+    };
+
+    this.log(circularObject);
+    assert.equal(this.stream.content[0], circularObject.toString() + '\n');
   }
 
 };
