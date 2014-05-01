@@ -46,6 +46,7 @@ Usage:
     log
       .debug('debug message')
       .info('info message')
+      .log('info message')
       .warn('warning')
       .error('this is an error message');
 
@@ -96,7 +97,7 @@ or call `Minilog.enable()` from the dev console or in code. On the browser, this
 
 ## Filtering
 
-Minilog supports filtering via the log scope name and the log level, as well as a number of nifty features. See [the filtering docs](filter.html) for more.
+Minilog supports filtering via the log scope name and the log level, as well as a number of nifty features. See [the filtering docs](http://mixu.net/minilog/filter.html) for more.
 
 ## Formatting & themes
 
