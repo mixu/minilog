@@ -15,6 +15,7 @@ build:
 	@echo 'Building dist/minilog.js'
 	./node_modules/gluejs/bin/gluejs \
 	--include ./lib/web \
+	--exclude package.json \
 	$(DEFAULTS) \
 	--command 'uglifyjs --no-copyright --mangle-toplevel'
 
