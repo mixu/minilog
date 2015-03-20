@@ -24,5 +24,6 @@
     "logging",
     "sysadmin",
     "tools"
-  ]
+  ],
+  "browser": "./lib/web/index.js"
 }
