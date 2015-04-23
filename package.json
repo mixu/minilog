@@ -2,7 +2,7 @@
   "name": "minilog",
   "description": "Lightweight client & server-side logging with Stream-API backends and counting, timing support",
   "license": "MIT",
-  "version": "2.0.7",
+  "version": "2.0.8",
   "main": "lib/index.js",
   "dependencies": {
     "microee": "0.0.2"
