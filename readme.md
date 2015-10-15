@@ -80,7 +80,7 @@ You can find a ready-made file for the web in [`./dist/minilog.js`](https://raw.
 
 ### Upgrading from minilog v1
 
-Everything is now a pipe, which means that the `.format()` and `.filter()` functions are deprecated. Check out [the new filter mechanism docs](./filter.html). To apply a formatter, you should pipe the input into the formatter, and then pipe it to the desired backend:
+Everything is now a pipe, which means that the `.format()` and `.filter()` functions are deprecated. Check out [the new filter mechanism docs](http://mixu.net/minilog/filter.html). To apply a formatter, you should pipe the input into the formatter, and then pipe it to the desired backend:
 
     var Minilog = require('minilog');
 
