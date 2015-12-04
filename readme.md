@@ -1,26 +1,26 @@
-### Why?
+# minilog
+
+Lightweight client & server-side logging with Stream-API backends
+
+### Features
 
 - Works in the browser and on the server
 - Themes for Node console output, and for the Chrome console (with fallbacks)
-- log.debug, log.info, log.warn, log.error
-- Associate log messages with a namespace and then filter by namespace and log level
+- Interface compatibility with Node and browser consoles, that is, you can replace `console.*` calls with Minilog since it supports (`.log`, `.debug`, `.info`, `.warn` and `.error`)
+- Each log message can be associated with a namespace.
+- Log output can be filtered by namespace and log level.
 - Pipe to one or more backend streams at the same time
 - Backends:
   - Node: Console, File (and all other WritableStreams), Redis
   - Browser: Console, LocalStorage, jQuery.ajax
+- In Chrome, we support theming the dev console output.
 
-## NEW! Minilog v2
 
 See the docs at [http://mixu.net/minilog/](http://mixu.net/minilog/).
 
-I recently released Minilog v2. Heres' what's changed:
+# Upgrading from 2.x to 3.x
 
-- Better browser console output: due to changes in the internals, all parameters are now passed through internally as-is. This means that in browsers other than old IE, any objects and arrays that are logged as objects rather than stringified.
-- Better filtering: submodules can now set a default logging level, and configuring the filter is less painful.
-- There is an explicit `.disable()` function in addition to `.enable()`
-- In Chrome, we support theming the dev console output.
-- The internals are more consistent with idiomatic usage of [Streams2](http://blog.nodejs.org/2012/12/20/streams2/) (with 0.8.x backward compatibility provided by readable-stream): filters and formatters are transform streams rather than functions.
-- Interface compatibility with Node and browser consoles, since `Minilog.log()` proxies to `Minilog.debug()`
+`v3.0` changes the ajax logger's POST payload from newline-separated JSON lines to a hash `{ logs: [ ... ] }`. Previously, this format was only used if `logger.extras` was set. This makes the POST payload parseable as JSON directly, but may require you to update your logging endpoint if you were using `v2.x` before.
 
 ## Pipes everywhere
 
