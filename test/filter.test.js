@@ -8,17 +8,43 @@ function filter(name, level) {
 }
 
 function enable(str) {
-  f.clear();
   // whitelisted only mode
-  f.defaultResult = false;
+  constructRules('whitelist', str);
+}
 
-  var parts = (str || '*.debug').split(/[\s,]+/), i, expr;
+function deny(str) {
+  // blacklisted only mode
+  constructRules('blacklist', str);
+}
+
+function constructRules(type, str) {
+  f.clear();
+
+  var defaultLevel;
+  if (type === 'whitelist') {
+    f.defaultResult = false;
+    defaultLevel = 'debug';
+  }
+  else if (type === 'blacklist') {
+    f.defaultResult = true
+    defaultLevel = 'error';
+  }
+  var parts = (str || '*.'+defaultLevel).split(/[\s,]+/), i, expr;
+  var rule, level;
   for(i = 0; i < parts.length; i++) {
     expr = parts[i].split('.');
     if(expr.length > 2) {
       expr = [ expr.slice(0, -1).join('.'), expr.slice(-1).join() ];
     }
-    f.allow(new RegExp('^'+expr[0].replace('*', '.*')), expr[1] || 'debug');
+    rule = new RegExp('^'+expr[0].replace('*', '.*'));
+    level = expr[1] || defaultLevel;
+
+    if (type === 'whitelist') {
+      f.allow(rule, level);
+    }
+    else if (type === 'blacklist') {
+      f.deny(rule, level);
+    }
   }
 }
 
@@ -69,6 +95,19 @@ exports['enable two modules with levels'] = function(done) {
   assert.ok(filter('aaa', 'error'));
   assert.ok(!filter('bbb', 'debug'));
   assert.ok(!filter('bbb', 'info'));
+  assert.ok(filter('bbb', 'warn'));
+  assert.ok(filter('bbb', 'error'));
+  done();
+};
+
+exports['deny two modules with levels'] = function(done) {
+  deny('aaa.error,bbb.debug');
+  assert.ok(!filter('aaa', 'debug'));
+  assert.ok(!filter('aaa', 'info'));
+  assert.ok(!filter('aaa', 'warn'));
+  assert.ok(!filter('aaa', 'error'));
+  assert.ok(!filter('bbb', 'debug'));
+  assert.ok(filter('bbb', 'info'));
   assert.ok(filter('bbb', 'warn'));
   assert.ok(filter('bbb', 'error'));
   done();
