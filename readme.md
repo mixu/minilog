@@ -123,7 +123,7 @@ To write your own formatter, have a look at the source code for the formatters -
 
 ## Using Minilog as a console replacement
 
-If you use an injected `console` object to log browser or Node.js activity, you can use Minilog instead: they have similar interfaces. Monolog provides a `log()` method, which proxies to `debug()`.
+If you use an injected `console` object to log browser or Node.js activity, you can use Minilog instead: they have similar interfaces. Minilog provides a `log()` method, which proxies to `debug()`.
 
 So for instance, the following snippet:
 
