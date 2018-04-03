@@ -1,19 +1,22 @@
 {
-  "name": "minilog",
+  "name": "@rontav/minilog",
   "description": "Lightweight client & server-side logging with Stream-API backends and counting, timing support",
   "license": "MIT",
-  "version": "3.1.0",
+  "version": "3.1.3",
+  "scripts": {
+    "pub": "npm publish --access=public"
+  },
   "main": "lib/index.js",
   "dependencies": {
     "microee": "0.0.6"
   },
   "devDependencies": {
-    "mocha": "*",
-    "gluejs": "2.x"
+    "gluejs": "2.x",
+    "mocha": "^5.0.4"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/mixu/minilog.git"
+    "url": "https://github.com/rontav/minilog.git"
   },
   "author": {
     "name": "Mikito Takada",
