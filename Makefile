@@ -17,7 +17,7 @@ build:
 	--include ./lib/web \
 	--exclude package.json \
 	$(DEFAULTS) \
-	--command 'uglifyjs --no-copyright --mangle-toplevel'
+	--command 'uglifyjs --toplevel'
 
 build-debug:
 	@mkdir -p ./dist/
