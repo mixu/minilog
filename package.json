@@ -1,5 +1,5 @@
 {
-  "name": "minilog",
+  "name": "@vista/minilog",
   "description": "Lightweight client & server-side logging with Stream-API backends and counting, timing support",
   "license": "MIT",
   "version": "3.1.0",
