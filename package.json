@@ -4,6 +4,10 @@
   "license": "MIT",
   "version": "3.1.0",
   "main": "lib/index.js",
+  "files": [
+    "/dist",
+    "/lib"
+  ],
   "dependencies": {
     "microee": "0.0.6"
   },
