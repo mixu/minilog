@@ -1,3 +1,8 @@
+# @cozy: Deprecation warning
+
+From now on, Cozy will use and maintain the monorepo version of this library: [cozy-minilog](https://www.npmjs.com/package/cozy-minilog).<br/>
+This repository will not be updated anymore. Please use the monorepo version instead. Thanks!
+
 # minilog
 
 Lightweight client & server-side logging with Stream-API backends
